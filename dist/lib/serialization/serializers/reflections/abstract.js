@@ -65,19 +65,10 @@ var ReflectionSerializer = (function (_super) {
             }
             var name = models_1.TraverseProperty[property];
             name = name.substr(0, 1).toLowerCase() + name.substr(1);
-            switch (property) {
-                case models_1.TraverseProperty.GetSignature:
-                case models_1.TraverseProperty.SetSignature:
-                case models_1.TraverseProperty.IndexSignature:
-                    obj[name] = _this.owner.toObject(child);
-                    break;
-                default:
-                    if (!obj[name]) {
-                        obj[name] = [];
-                    }
-                    obj[name].push(_this.owner.toObject(child));
-                    break;
+            if (!obj[name]) {
+                obj[name] = [];
             }
+            obj[name].push(_this.owner.toObject(child));
         });
         return obj;
     };
