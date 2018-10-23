@@ -3,14 +3,14 @@ export declare class ReflectionGroup {
     title: string;
     kind: ReflectionKind;
     children: Reflection[];
-    cssClasses: string;
+    cssClasses?: string;
     allChildrenHaveOwnDocument: Function;
-    allChildrenAreInherited: boolean;
-    allChildrenArePrivate: boolean;
-    allChildrenAreProtectedOrPrivate: boolean;
-    allChildrenAreExternal: boolean;
-    someChildrenAreExported: boolean;
+    allChildrenAreInherited?: boolean;
+    allChildrenArePrivate?: boolean;
+    allChildrenAreProtectedOrPrivate?: boolean;
+    allChildrenAreExternal?: boolean;
+    someChildrenAreExported?: boolean;
     constructor(title: string, kind: ReflectionKind);
-    private getAllChildrenHaveOwnDocument();
+    private getAllChildrenHaveOwnDocument;
     toObject(): any;
 }
