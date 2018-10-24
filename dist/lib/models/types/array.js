@@ -1,35 +1,51 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("./index");
-class ArrayType extends index_1.Type {
-    constructor(elementType) {
-        super();
-        this.type = 'array';
-        this.elementType = elementType;
+var index_1 = require("./index");
+var ArrayType = (function (_super) {
+    __extends(ArrayType, _super);
+    function ArrayType(elementType) {
+        var _this = _super.call(this) || this;
+        _this.type = 'array';
+        _this.elementType = elementType;
+        return _this;
     }
-    clone() {
+    ArrayType.prototype.clone = function () {
         return new ArrayType(this.elementType);
-    }
-    equals(type) {
+    };
+    ArrayType.prototype.equals = function (type) {
         if (!(type instanceof ArrayType)) {
             return false;
         }
         return type.elementType.equals(this.elementType);
-    }
-    toObject() {
-        const result = super.toObject();
+    };
+    ArrayType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         result.elementType = this.elementType.toObject();
         return result;
-    }
-    toString() {
-        const elementTypeStr = this.elementType.toString();
+    };
+    ArrayType.prototype.toString = function () {
+        var elementTypeStr = this.elementType.toString();
         if (this.elementType instanceof index_1.UnionType || this.elementType instanceof index_1.IntersectionType) {
             return '(' + elementTypeStr + ')[]';
         }
         else {
             return elementTypeStr + '[]';
         }
-    }
-}
+    };
+    return ArrayType;
+}(index_1.Type));
 exports.ArrayType = ArrayType;
 //# sourceMappingURL=array.js.map

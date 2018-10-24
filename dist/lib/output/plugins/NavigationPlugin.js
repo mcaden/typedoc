@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,20 +19,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const components_1 = require("../components");
-const events_1 = require("../events");
-let NavigationPlugin = class NavigationPlugin extends components_1.RendererComponent {
-    initialize() {
-        this.listenTo(this.owner, {
-            [events_1.RendererEvent.BEGIN]: this.onBeginRenderer,
-            [events_1.PageEvent.BEGIN]: this.onBeginPage
-        });
+var components_1 = require("../components");
+var events_1 = require("../events");
+var NavigationPlugin = (function (_super) {
+    __extends(NavigationPlugin, _super);
+    function NavigationPlugin() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    onBeginRenderer(event) {
+    NavigationPlugin.prototype.initialize = function () {
+        var _a;
+        this.listenTo(this.owner, (_a = {},
+            _a[events_1.RendererEvent.BEGIN] = this.onBeginRenderer,
+            _a[events_1.PageEvent.BEGIN] = this.onBeginPage,
+            _a));
+    };
+    NavigationPlugin.prototype.onBeginRenderer = function (event) {
         this.navigation = this.owner.theme.getNavigation(event.project);
-    }
-    onBeginPage(page) {
-        const currentItems = [];
+    };
+    NavigationPlugin.prototype.onBeginPage = function (page) {
+        var currentItems = [];
         (function updateItem(item) {
             item.isCurrent = false;
             item.isInPath = false;
@@ -28,13 +46,13 @@ let NavigationPlugin = class NavigationPlugin extends components_1.RendererCompo
                 currentItems.push(item);
             }
             if (item.children) {
-                item.children.forEach((child) => updateItem(child));
+                item.children.forEach(function (child) { return updateItem(child); });
             }
         })(this.navigation);
-        currentItems.forEach((item) => {
+        currentItems.forEach(function (item) {
             item.isCurrent = true;
-            let depth = item.isGlobals ? -1 : 0;
-            let count = 1;
+            var depth = item.isGlobals ? -1 : 0;
+            var count = 1;
             while (item) {
                 item.isInPath = true;
                 item.isVisible = true;
@@ -43,7 +61,7 @@ let NavigationPlugin = class NavigationPlugin extends components_1.RendererCompo
                 if (item.children) {
                     count += item.children.length;
                     if (depth < 2 || count < 30) {
-                        item.children.forEach((child) => {
+                        item.children.forEach(function (child) {
                             child.isVisible = true;
                         });
                     }
@@ -52,10 +70,11 @@ let NavigationPlugin = class NavigationPlugin extends components_1.RendererCompo
             }
         });
         page.navigation = this.navigation;
-    }
-};
-NavigationPlugin = __decorate([
-    components_1.Component({ name: 'navigation' })
-], NavigationPlugin);
+    };
+    NavigationPlugin = __decorate([
+        components_1.Component({ name: 'navigation' })
+    ], NavigationPlugin);
+    return NavigationPlugin;
+}(components_1.RendererComponent));
 exports.NavigationPlugin = NavigationPlugin;
 //# sourceMappingURL=NavigationPlugin.js.map

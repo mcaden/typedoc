@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const tsany = ts;
+var ts = require("typescript");
+var tsany = ts;
 function createCompilerDiagnostic() {
     return tsany.createCompilerDiagnostic.apply(this, arguments);
 }
@@ -34,7 +34,8 @@ function getSourceFileOfNode(node) {
     return tsany.getSourceFileOfNode.apply(this, arguments);
 }
 exports.getSourceFileOfNode = getSourceFileOfNode;
-function getTextOfNode(node, includeTrivia = false) {
+function getTextOfNode(node, includeTrivia) {
+    if (includeTrivia === void 0) { includeTrivia = false; }
     return tsany.getTextOfNode.apply(this, arguments);
 }
 exports.getTextOfNode = getTextOfNode;

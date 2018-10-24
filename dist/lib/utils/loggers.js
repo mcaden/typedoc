@@ -1,7 +1,20 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const Util = require("util");
+var ts = require("typescript");
+var Util = require("util");
 var LogLevel;
 (function (LogLevel) {
     LogLevel[LogLevel["Verbose"] = 0] = "Verbose";
@@ -10,49 +23,75 @@ var LogLevel;
     LogLevel[LogLevel["Error"] = 3] = "Error";
     LogLevel[LogLevel["Success"] = 4] = "Success";
 })(LogLevel = exports.LogLevel || (exports.LogLevel = {}));
-class Logger {
-    constructor() {
+var Logger = (function () {
+    function Logger() {
         this.errorCount = 0;
     }
-    hasErrors() {
+    Logger.prototype.hasErrors = function () {
         return this.errorCount > 0;
-    }
-    resetErrors() {
+    };
+    Logger.prototype.resetErrors = function () {
         this.errorCount = 0;
-    }
-    write(text, ...args) {
+    };
+    Logger.prototype.write = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Info);
-    }
-    writeln(text, ...args) {
+    };
+    Logger.prototype.writeln = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Info, true);
-    }
-    success(text, ...args) {
+    };
+    Logger.prototype.success = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Success);
-    }
-    verbose(text, ...args) {
+    };
+    Logger.prototype.verbose = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Verbose);
-    }
-    warn(text, ...args) {
+    };
+    Logger.prototype.warn = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Warn);
-    }
-    error(text, ...args) {
+    };
+    Logger.prototype.error = function (text) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         this.log(Util.format.apply(this, arguments), LogLevel.Error);
-    }
-    log(message, level = LogLevel.Info, newLine) {
+    };
+    Logger.prototype.log = function (message, level, newLine) {
+        if (level === void 0) { level = LogLevel.Info; }
         if (level === LogLevel.Error) {
             this.errorCount += 1;
         }
-    }
-    diagnostics(diagnostics) {
-        diagnostics.forEach((diagnostic) => {
-            this.diagnostic(diagnostic);
+    };
+    Logger.prototype.diagnostics = function (diagnostics) {
+        var _this = this;
+        diagnostics.forEach(function (diagnostic) {
+            _this.diagnostic(diagnostic);
         });
-    }
-    diagnostic(diagnostic) {
-        let output;
+    };
+    Logger.prototype.diagnostic = function (diagnostic) {
+        var output;
         if (diagnostic.file) {
             output = diagnostic.file.fileName;
-            output += '(' + ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start || 0).line + ')';
+            output += '(' + ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start).line + ')';
             output += ts.sys.newLine + ' ' + ts.flattenDiagnosticMessageText(diagnostic.messageText, ts.sys.newLine);
         }
         else {
@@ -68,15 +107,21 @@ class Logger {
             case ts.DiagnosticCategory.Message:
                 this.log(output, LogLevel.Info);
         }
-    }
-}
+    };
+    return Logger;
+}());
 exports.Logger = Logger;
-class ConsoleLogger extends Logger {
-    log(message, level = LogLevel.Info, newLine) {
+var ConsoleLogger = (function (_super) {
+    __extends(ConsoleLogger, _super);
+    function ConsoleLogger() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ConsoleLogger.prototype.log = function (message, level, newLine) {
+        if (level === void 0) { level = LogLevel.Info; }
         if (level === LogLevel.Error) {
             this.errorCount += 1;
         }
-        let output = '';
+        var output = '';
         if (level === LogLevel.Error) {
             output += 'Error: ';
         }
@@ -91,20 +136,25 @@ class ConsoleLogger extends Logger {
         if (level === LogLevel.Success) {
             ts.sys.write(ts.sys.newLine);
         }
-    }
-}
+    };
+    return ConsoleLogger;
+}(Logger));
 exports.ConsoleLogger = ConsoleLogger;
-class CallbackLogger extends Logger {
-    constructor(callback) {
-        super();
-        this.callback = callback;
+var CallbackLogger = (function (_super) {
+    __extends(CallbackLogger, _super);
+    function CallbackLogger(callback) {
+        var _this = _super.call(this) || this;
+        _this.callback = callback;
+        return _this;
     }
-    log(message, level = LogLevel.Info, newLine) {
+    CallbackLogger.prototype.log = function (message, level, newLine) {
+        if (level === void 0) { level = LogLevel.Info; }
         if (level === LogLevel.Error) {
             this.errorCount += 1;
         }
         this.callback(message, level, newLine);
-    }
-}
+    };
+    return CallbackLogger;
+}(Logger));
 exports.CallbackLogger = CallbackLogger;
 //# sourceMappingURL=loggers.js.map

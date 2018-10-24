@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,26 +19,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const _ts = require("../../../ts-internal");
-const component_1 = require("../../component");
-const options_1 = require("../options");
-const declaration_1 = require("../declaration");
-let ArgumentsReader = class ArgumentsReader extends options_1.OptionsComponent {
-    initialize() {
-        this.listenTo(this.owner, options_1.DiscoverEvent.DISCOVER, this.onDiscover, -200);
+var ts = require("typescript");
+var _ts = require("../../../ts-internal");
+var component_1 = require("../../component");
+var options_1 = require("../options");
+var declaration_1 = require("../declaration");
+var ArgumentsReader = (function (_super) {
+    __extends(ArgumentsReader, _super);
+    function ArgumentsReader() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    onDiscover(event) {
+    ArgumentsReader.prototype.initialize = function () {
+        this.listenTo(this.owner, options_1.DiscoverEvent.DISCOVER, this.onDiscover, -200);
+    };
+    ArgumentsReader.prototype.onDiscover = function (event) {
         if (this.application.isCLI) {
             this.parseArguments(event);
         }
-    }
-    parseArguments(event, passedArgs) {
-        let index = 0;
-        const owner = this.owner;
-        const args = passedArgs || process.argv.slice(2);
+    };
+    ArgumentsReader.prototype.parseArguments = function (event, args) {
+        var index = 0;
+        var owner = this.owner;
+        args = args || process.argv.slice(2);
         function readArgument(arg) {
-            const declaration = owner.getDeclaration(arg);
+            var declaration = owner.getDeclaration(arg);
             if (!declaration) {
                 event.addError('Unknown option: %s', arg);
             }
@@ -41,9 +58,9 @@ let ArgumentsReader = class ArgumentsReader extends options_1.OptionsComponent {
                 event.data[declaration.name] = true;
             }
         }
-        const files = [];
+        var files = [];
         while (index < args.length) {
-            const arg = args[index++];
+            var arg = args[index++];
             if (arg.charCodeAt(0) === _ts.CharacterCodes.at) {
                 this.parseResponseFile(event, arg.slice(1));
             }
@@ -57,15 +74,15 @@ let ArgumentsReader = class ArgumentsReader extends options_1.OptionsComponent {
         if (files && files.length > 0) {
             event.inputFiles = files;
         }
-    }
-    parseResponseFile(event, filename) {
-        const text = ts.sys.readFile(filename);
+    };
+    ArgumentsReader.prototype.parseResponseFile = function (event, filename) {
+        var text = ts.sys.readFile(filename);
         if (!text) {
             event.addError('File not found: "%s"', filename);
             return;
         }
-        const args = [];
-        let pos = 0;
+        var args = [];
+        var pos = 0;
         while (true) {
             while (pos < text.length && text.charCodeAt(pos) <= _ts.CharacterCodes.space) {
                 pos++;
@@ -73,7 +90,7 @@ let ArgumentsReader = class ArgumentsReader extends options_1.OptionsComponent {
             if (pos >= text.length) {
                 break;
             }
-            const start = pos;
+            var start = pos;
             if (text.charCodeAt(start) === _ts.CharacterCodes.doubleQuote) {
                 pos++;
                 while (pos < text.length && text.charCodeAt(pos) !== _ts.CharacterCodes.doubleQuote) {
@@ -96,10 +113,11 @@ let ArgumentsReader = class ArgumentsReader extends options_1.OptionsComponent {
             }
         }
         this.parseArguments(event, args);
-    }
-};
-ArgumentsReader = __decorate([
-    component_1.Component({ name: 'options:arguments' })
-], ArgumentsReader);
+    };
+    ArgumentsReader = __decorate([
+        component_1.Component({ name: 'options:arguments' })
+    ], ArgumentsReader);
+    return ArgumentsReader;
+}(options_1.OptionsComponent));
 exports.ArgumentsReader = ArgumentsReader;
 //# sourceMappingURL=arguments.js.map

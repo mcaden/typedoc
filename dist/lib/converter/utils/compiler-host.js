@@ -1,12 +1,29 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const _ts = require("../../ts-internal");
-const components_1 = require("../components");
-const ERROR_UNSUPPORTED_FILE_ENCODING = -2147024809;
-class CompilerHost extends components_1.ConverterComponent {
-    getSourceFile(filename, languageVersion, onError) {
-        let text;
+var ts = require("typescript");
+var _ts = require("../../ts-internal");
+var components_1 = require("../components");
+var ERROR_UNSUPPORTED_FILE_ENCODING = -2147024809;
+var CompilerHost = (function (_super) {
+    __extends(CompilerHost, _super);
+    function CompilerHost() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CompilerHost.prototype.getSourceFile = function (filename, languageVersion, onError) {
+        var text;
         try {
             text = ts.sys.readFile(filename, this.application.options.getCompilerOptions().charset);
         }
@@ -17,36 +34,37 @@ class CompilerHost extends components_1.ConverterComponent {
             text = '';
         }
         return text !== undefined ? ts.createSourceFile(filename, text, languageVersion) : undefined;
-    }
-    getDefaultLibFileName(options) {
-        const libLocation = _ts.getDirectoryPath(_ts.normalizePath(ts.sys.getExecutingFilePath()));
+    };
+    CompilerHost.prototype.getDefaultLibFileName = function (options) {
+        var libLocation = _ts.getDirectoryPath(_ts.normalizePath(ts.sys.getExecutingFilePath()));
         return _ts.combinePaths(libLocation, ts.getDefaultLibFileName(options));
-    }
-    getDirectories(path) {
+    };
+    CompilerHost.prototype.getDirectories = function (path) {
         return ts.sys.getDirectories(path);
-    }
-    getCurrentDirectory() {
+    };
+    CompilerHost.prototype.getCurrentDirectory = function () {
         return this.currentDirectory || (this.currentDirectory = ts.sys.getCurrentDirectory());
-    }
-    useCaseSensitiveFileNames() {
+    };
+    CompilerHost.prototype.useCaseSensitiveFileNames = function () {
         return ts.sys.useCaseSensitiveFileNames;
-    }
-    fileExists(fileName) {
+    };
+    CompilerHost.prototype.fileExists = function (fileName) {
         return ts.sys.fileExists(fileName);
-    }
-    directoryExists(directoryName) {
+    };
+    CompilerHost.prototype.directoryExists = function (directoryName) {
         return ts.sys.directoryExists(directoryName);
-    }
-    readFile(fileName) {
+    };
+    CompilerHost.prototype.readFile = function (fileName) {
         return ts.sys.readFile(fileName);
-    }
-    getCanonicalFileName(fileName) {
+    };
+    CompilerHost.prototype.getCanonicalFileName = function (fileName) {
         return ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase();
-    }
-    getNewLine() {
+    };
+    CompilerHost.prototype.getNewLine = function () {
         return ts.sys.newLine;
-    }
-    writeFile(fileName, data, writeByteOrderMark, onError) { }
-}
+    };
+    CompilerHost.prototype.writeFile = function (fileName, data, writeByteOrderMark, onError) { };
+    return CompilerHost;
+}(components_1.ConverterComponent));
 exports.CompilerHost = CompilerHost;
 //# sourceMappingURL=compiler-host.js.map

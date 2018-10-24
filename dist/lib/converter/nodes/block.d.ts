@@ -7,7 +7,7 @@ export declare enum SourceFileMode {
     Modules = 1
 }
 export declare class BlockConverter extends ConverterNodeComponent<ts.SourceFile | ts.Block | ts.ModuleBlock> {
-    mode: SourceFileMode;
+    mode: number;
     supports: ts.SyntaxKind[];
     convert(context: Context, node: ts.SourceFile | ts.Block | ts.ModuleBlock): Reflection;
     private convertSourceFile;

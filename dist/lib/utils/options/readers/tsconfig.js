@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,20 +19,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var TSConfigReader_1;
-const Path = require("path");
-const FS = require("fs");
-const _ = require("lodash");
-const ts = require("typescript");
-const component_1 = require("../../component");
-const options_1 = require("../options");
-const declaration_1 = require("../declaration");
-const typescript_1 = require("../sources/typescript");
-let TSConfigReader = TSConfigReader_1 = class TSConfigReader extends options_1.OptionsComponent {
-    initialize() {
-        this.listenTo(this.owner, options_1.DiscoverEvent.DISCOVER, this.onDiscover, -100);
+var Path = require("path");
+var FS = require("fs");
+var _ = require("lodash");
+var ts = require("typescript");
+var component_1 = require("../../component");
+var options_1 = require("../options");
+var declaration_1 = require("../declaration");
+var typescript_1 = require("../sources/typescript");
+var TSConfigReader = (function (_super) {
+    __extends(TSConfigReader, _super);
+    function TSConfigReader() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    onDiscover(event) {
+    TSConfigReader_1 = TSConfigReader;
+    TSConfigReader.prototype.initialize = function () {
+        this.listenTo(this.owner, options_1.DiscoverEvent.DISCOVER, this.onDiscover, -100);
+    };
+    TSConfigReader.prototype.onDiscover = function (event) {
         if (event.mode !== options_1.OptionsReadMode.Fetch) {
             return;
         }
@@ -27,24 +44,24 @@ let TSConfigReader = TSConfigReader_1 = class TSConfigReader extends options_1.O
             this.load(event, Path.resolve(event.data[TSConfigReader_1.OPTIONS_KEY]));
         }
         else if (TSConfigReader_1.PROJECT_KEY in event.data) {
-            const file = ts.findConfigFile(event.data[TSConfigReader_1.PROJECT_KEY], ts.sys.fileExists);
+            var file = ts.findConfigFile(event.data[TSConfigReader_1.PROJECT_KEY], ts.sys.fileExists);
             if (file) {
                 this.load(event, file);
             }
         }
         else if (this.application.isCLI) {
-            const file = ts.findConfigFile('.', ts.sys.fileExists);
+            var file = ts.findConfigFile('.', ts.sys.fileExists);
             if (file) {
                 this.load(event, file);
             }
         }
-    }
-    load(event, fileName) {
+    };
+    TSConfigReader.prototype.load = function (event, fileName) {
         if (!FS.existsSync(fileName)) {
             event.addError('The tsconfig file %s does not exist.', fileName);
             return;
         }
-        const { config } = ts.readConfigFile(fileName, ts.sys.readFile);
+        var config = ts.readConfigFile(fileName, ts.sys.readFile).config;
         if (config === undefined) {
             event.addError('The tsconfig file %s does not contain valid JSON.', fileName);
             return;
@@ -53,27 +70,30 @@ let TSConfigReader = TSConfigReader_1 = class TSConfigReader extends options_1.O
             event.addError('The tsconfig file %s does not contain a JSON object.', fileName);
             return;
         }
-        const { fileNames, options, raw: { typedocOptions } } = ts.parseJsonConfigFileContent(config, ts.sys, Path.resolve(Path.dirname(fileName)), {}, Path.resolve(fileName));
+        var _a = ts.parseJsonConfigFileContent(config, ts.sys, Path.resolve(Path.dirname(fileName)), {}, Path.resolve(fileName)), fileNames = _a.fileNames, options = _a.options, typedocOptions = _a.raw.typedocOptions;
         event.inputFiles = fileNames;
-        const ignored = typescript_1.TypeScriptSource.IGNORED;
-        for (const key of ignored) {
+        var ignored = typescript_1.TypeScriptSource.IGNORED;
+        for (var _i = 0, ignored_1 = ignored; _i < ignored_1.length; _i++) {
+            var key = ignored_1[_i];
             delete options[key];
         }
         _.defaults(event.data, typedocOptions, options);
-    }
-};
-TSConfigReader.OPTIONS_KEY = 'tsconfig';
-TSConfigReader.PROJECT_KEY = 'project';
-__decorate([
-    component_1.Option({
-        name: TSConfigReader_1.OPTIONS_KEY,
-        help: 'Specify a typescript config file that should be loaded. If not specified TypeDoc will look for \'tsconfig.json\' in the current directory.',
-        type: declaration_1.ParameterType.String,
-        hint: declaration_1.ParameterHint.File
-    })
-], TSConfigReader.prototype, "options", void 0);
-TSConfigReader = TSConfigReader_1 = __decorate([
-    component_1.Component({ name: 'options:tsconfig' })
-], TSConfigReader);
+    };
+    var TSConfigReader_1;
+    TSConfigReader.OPTIONS_KEY = 'tsconfig';
+    TSConfigReader.PROJECT_KEY = 'project';
+    __decorate([
+        component_1.Option({
+            name: TSConfigReader_1.OPTIONS_KEY,
+            help: 'Specify a typescript config file that should be loaded. If not specified TypeDoc will look for \'tsconfig.json\' in the current directory.',
+            type: declaration_1.ParameterType.String,
+            hint: declaration_1.ParameterHint.File
+        })
+    ], TSConfigReader.prototype, "options", void 0);
+    TSConfigReader = TSConfigReader_1 = __decorate([
+        component_1.Component({ name: 'options:tsconfig' })
+    ], TSConfigReader);
+    return TSConfigReader;
+}(options_1.OptionsComponent));
 exports.TSConfigReader = TSConfigReader;
 //# sourceMappingURL=tsconfig.js.map

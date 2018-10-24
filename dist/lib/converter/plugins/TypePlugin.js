@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,23 +19,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("../../models/reflections/index");
-const index_2 = require("../../models/types/index");
-const components_1 = require("../components");
-const converter_1 = require("../converter");
-let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
-    constructor() {
-        super(...arguments);
-        this.reflections = [];
+var index_1 = require("../../models/reflections/index");
+var index_2 = require("../../models/types/index");
+var components_1 = require("../components");
+var converter_1 = require("../converter");
+var TypePlugin = (function (_super) {
+    __extends(TypePlugin, _super);
+    function TypePlugin() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.reflections = [];
+        return _this;
     }
-    initialize() {
-        this.listenTo(this.owner, {
-            [converter_1.Converter.EVENT_RESOLVE]: this.onResolve,
-            [converter_1.Converter.EVENT_RESOLVE_END]: this.onResolveEnd
-        });
-    }
-    onResolve(context, reflection) {
-        const project = context.project;
+    TypePlugin.prototype.initialize = function () {
+        var _a;
+        this.listenTo(this.owner, (_a = {},
+            _a[converter_1.Converter.EVENT_RESOLVE] = this.onResolve,
+            _a[converter_1.Converter.EVENT_RESOLVE_END] = this.onResolveEnd,
+            _a));
+    };
+    TypePlugin.prototype.onResolve = function (context, reflection) {
+        var _this = this;
+        var project = context.project;
         resolveType(reflection, reflection.type);
         resolveType(reflection, reflection.inheritedFrom);
         resolveType(reflection, reflection.overwrites);
@@ -30,7 +47,7 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
         resolveTypes(reflection, reflection.extendedBy);
         resolveTypes(reflection, reflection.implementedTypes);
         if (reflection.decorators) {
-            reflection.decorators.forEach((decorator) => {
+            reflection.decorators.forEach(function (decorator) {
                 if (decorator.type) {
                     resolveType(reflection, decorator.type);
                 }
@@ -38,15 +55,15 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
         }
         if (reflection.kindOf(index_1.ReflectionKind.ClassOrInterface)) {
             this.postpone(reflection);
-            walk(reflection.implementedTypes, (target) => {
-                this.postpone(target);
+            walk(reflection.implementedTypes, function (target) {
+                _this.postpone(target);
                 if (!target.implementedBy) {
                     target.implementedBy = [];
                 }
                 target.implementedBy.push(new index_2.ReferenceType(reflection.name, index_2.ReferenceType.SYMBOL_ID_RESOLVED, reflection));
             });
-            walk(reflection.extendedTypes, (target) => {
-                this.postpone(target);
+            walk(reflection.extendedTypes, function (target) {
+                _this.postpone(target);
                 if (!target.extendedBy) {
                     target.extendedBy = [];
                 }
@@ -57,7 +74,7 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
             if (!types) {
                 return;
             }
-            types.forEach(type => {
+            types.forEach(function (type) {
                 if (!(type instanceof index_2.ReferenceType)) {
                     return;
                 }
@@ -71,7 +88,7 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
             if (!types) {
                 return;
             }
-            for (let i = 0, c = types.length; i < c; i++) {
+            for (var i = 0, c = types.length; i < c; i++) {
                 resolveType(reflection, types[i]);
             }
         }
@@ -97,26 +114,26 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
                 resolveType(reflection, type.elementType);
             }
         }
-    }
-    postpone(reflection) {
+    };
+    TypePlugin.prototype.postpone = function (reflection) {
         if (this.reflections.indexOf(reflection) === -1) {
             this.reflections.push(reflection);
         }
-    }
-    onResolveEnd(context) {
-        this.reflections.forEach((reflection) => {
+    };
+    TypePlugin.prototype.onResolveEnd = function (context) {
+        this.reflections.forEach(function (reflection) {
             if (reflection.implementedBy) {
-                reflection.implementedBy.sort((a, b) => {
+                reflection.implementedBy.sort(function (a, b) {
                     if (a['name'] === b['name']) {
                         return 0;
                     }
                     return a['name'] > b['name'] ? 1 : -1;
                 });
             }
-            let root;
-            let hierarchy;
+            var root;
+            var hierarchy;
             function push(types) {
-                const level = { types: types };
+                var level = { types: types };
                 if (hierarchy) {
                     hierarchy.next = level;
                     hierarchy = level;
@@ -135,10 +152,11 @@ let TypePlugin = class TypePlugin extends components_1.ConverterComponent {
             }
             reflection.typeHierarchy = root;
         });
-    }
-};
-TypePlugin = __decorate([
-    components_1.Component({ name: 'type' })
-], TypePlugin);
+    };
+    TypePlugin = __decorate([
+        components_1.Component({ name: 'type' })
+    ], TypePlugin);
+    return TypePlugin;
+}(components_1.ConverterComponent));
 exports.TypePlugin = TypePlugin;
 //# sourceMappingURL=TypePlugin.js.map

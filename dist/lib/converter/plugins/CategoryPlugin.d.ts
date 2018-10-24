@@ -2,7 +2,7 @@ import { Reflection } from '../../models/reflections/index';
 import { ReflectionCategory } from '../../models/ReflectionCategory';
 import { ConverterComponent } from '../components';
 export declare class CategoryPlugin extends ConverterComponent {
-    static WEIGHTS: string[];
+    static WEIGHTS: any[];
     initialize(): void;
     private onResolve;
     private onEndResolve;

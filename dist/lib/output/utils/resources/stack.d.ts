@@ -19,23 +19,23 @@ export declare class ResourceOrigin<T extends Resource> {
     constructor(stack: ResourceStack<T>, name: string, path: string);
     mergeResources(target: ResourceMap<T>): void;
     hasResource(name: string): boolean;
-    getResource(name: string): T | undefined;
+    getResource(name: string): T;
     getName(): string;
     private findResources;
 }
 export declare abstract class ResourceStack<T extends Resource> {
     private isActive;
-    private resourceClass;
-    private resourceRegExp;
+    private ressourceClass;
+    private ressourceRegExp;
     private origins;
-    constructor(resourceClass: ResourceClass<T>, resourceRegExp?: RegExp);
+    constructor(ressourceClass: ResourceClass<T>, ressourceRegExp?: RegExp);
     activate(): boolean;
     deactivate(): boolean;
-    getResource(name: string): T | undefined;
+    getResource(name: string): T;
     getAllResources(): ResourceMap<T>;
     getResourceClass(): ResourceClass<T>;
-    getResourceRegExp(): RegExp;
-    getOrigin(name: string): ResourceOrigin<T> | undefined;
+    getRessourceRegExp(): RegExp;
+    getOrigin(name: string): ResourceOrigin<T>;
     hasOrigin(name: string): boolean;
     addOrigin(name: string, path: string, ignoreErrors?: boolean): void;
     removeOrigin(name: string): void;

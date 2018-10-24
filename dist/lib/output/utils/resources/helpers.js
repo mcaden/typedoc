@@ -1,12 +1,29 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const Path = require("path");
-const Handlebars = require("handlebars");
-const stack_1 = require("./stack");
-class Helper extends stack_1.Resource {
-    getHelpers() {
+var Path = require("path");
+var Handlebars = require("handlebars");
+var stack_1 = require("./stack");
+var Helper = (function (_super) {
+    __extends(Helper, _super);
+    function Helper() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Helper.prototype.getHelpers = function () {
         if (!this.helpers) {
-            const file = require(this.fileName);
+            var file = require(this.fileName);
             if (typeof file === 'object') {
                 this.helpers = file;
             }
@@ -18,49 +35,54 @@ class Helper extends stack_1.Resource {
             }
         }
         return this.helpers;
-    }
-}
+    };
+    return Helper;
+}(stack_1.Resource));
 exports.Helper = Helper;
-class HelperStack extends stack_1.ResourceStack {
-    constructor() {
-        super(Helper, /\.js$/);
-        this.registeredNames = [];
-        this.addCoreHelpers();
+var HelperStack = (function (_super) {
+    __extends(HelperStack, _super);
+    function HelperStack() {
+        var _this = _super.call(this, Helper, /\.js$/) || this;
+        _this.registeredNames = [];
+        _this.addCoreHelpers();
+        return _this;
     }
-    activate() {
-        if (!super.activate()) {
+    HelperStack.prototype.activate = function () {
+        if (!_super.prototype.activate.call(this)) {
             return false;
         }
-        const resources = this.getAllResources();
-        for (let resourceName in resources) {
-            const helpers = resources[resourceName].getHelpers();
-            for (let name in helpers) {
-                if (this.registeredNames.indexOf(name) !== -1) {
+        var resources = this.getAllResources();
+        for (var resourceName in resources) {
+            var helpers = resources[resourceName].getHelpers();
+            for (var name_1 in helpers) {
+                if (this.registeredNames.indexOf(name_1) !== -1) {
                     continue;
                 }
-                this.registeredNames.push(name);
-                Handlebars.registerHelper(name, helpers[name]);
+                this.registeredNames.push(name_1);
+                Handlebars.registerHelper(name_1, helpers[name_1]);
             }
         }
         return true;
-    }
-    deactivate() {
-        if (!super.deactivate()) {
+    };
+    HelperStack.prototype.deactivate = function () {
+        if (!_super.prototype.deactivate.call(this)) {
             return false;
         }
-        for (let name of this.registeredNames) {
-            Handlebars.unregisterHelper(name);
+        for (var _i = 0, _a = this.registeredNames; _i < _a.length; _i++) {
+            var name_2 = _a[_i];
+            Handlebars.unregisterHelper(name_2);
         }
         this.registeredNames = [];
         return true;
-    }
-    addCoreHelpers() {
+    };
+    HelperStack.prototype.addCoreHelpers = function () {
         this.addOrigin('core', Path.join(__dirname, '..', '..', 'helpers'));
-    }
-    removeAllOrigins() {
-        super.removeAllOrigins();
+    };
+    HelperStack.prototype.removeAllOrigins = function () {
+        _super.prototype.removeAllOrigins.call(this);
         this.addCoreHelpers();
-    }
-}
+    };
+    return HelperStack;
+}(stack_1.ResourceStack));
 exports.HelperStack = HelperStack;
 //# sourceMappingURL=helpers.js.map

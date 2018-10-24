@@ -1,31 +1,47 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_1 = require("./abstract");
-class TypeOperatorType extends abstract_1.Type {
-    constructor(target) {
-        super();
-        this.type = 'typeOperator';
-        this.operator = 'keyof';
-        this.target = target;
+var abstract_1 = require("./abstract");
+var TypeOperatorType = (function (_super) {
+    __extends(TypeOperatorType, _super);
+    function TypeOperatorType(target) {
+        var _this = _super.call(this) || this;
+        _this.type = 'typeOperator';
+        _this.operator = 'keyof';
+        _this.target = target;
+        return _this;
     }
-    clone() {
+    TypeOperatorType.prototype.clone = function () {
         return new TypeOperatorType(this.target.clone());
-    }
-    equals(type) {
+    };
+    TypeOperatorType.prototype.equals = function (type) {
         if (!(type instanceof TypeOperatorType)) {
             return false;
         }
         return type.target.equals(this.target);
-    }
-    toObject() {
-        const result = super.toObject();
+    };
+    TypeOperatorType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         result.operator = this.operator;
         result.target = this.target.toObject();
         return result;
-    }
-    toString() {
-        return `${this.operator} ${this.target.toString()}`;
-    }
-}
+    };
+    TypeOperatorType.prototype.toString = function () {
+        return "keyof " + this.target.toString();
+    };
+    return TypeOperatorType;
+}(abstract_1.Type));
 exports.TypeOperatorType = TypeOperatorType;
 //# sourceMappingURL=type-operator.js.map

@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,38 +19,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var Serializer_1;
-const utils_1 = require("../utils");
-const component_1 = require("../utils/component");
-const components_1 = require("./components");
-const events_1 = require("./events");
-let Serializer = Serializer_1 = class Serializer extends utils_1.ChildableComponent {
-    initialize() {
+var utils_1 = require("../utils");
+var component_1 = require("../utils/component");
+var components_1 = require("./components");
+var events_1 = require("./events");
+var Serializer = (function (_super) {
+    __extends(Serializer, _super);
+    function Serializer() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Serializer_1 = Serializer;
+    Serializer.prototype.initialize = function () {
         this.router = new Map();
         this.routes = [];
-    }
-    addComponent(name, componentClass) {
-        const component = super.addComponent(name, componentClass);
+    };
+    Serializer.prototype.addComponent = function (name, componentClass) {
+        var component = _super.prototype.addComponent.call(this, name, componentClass);
         if (component.serializeGroup && component.serializeGroupSymbol) {
-            let match = this.router.get(component.serializeGroup);
+            var match = this.router.get(component.serializeGroup);
             if (!match) {
-                match = Array.from(this.router.values()).find(v => v.symbol === component.serializeGroupSymbol)
+                match = Array.from(this.router.values()).find(function (v) { return v.symbol === component.serializeGroupSymbol; })
                     || { symbol: component.serializeGroupSymbol, group: [] };
                 this.router.set(component.serializeGroup, match);
                 this.routes.push(component.serializeGroup);
             }
             match.group.push(component);
-            match.group.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+            match.group.sort(function (a, b) { return (b.priority || 0) - (a.priority || 0); });
+            return component;
         }
-        return component;
-    }
-    removeComponent(name) {
-        const component = super.removeComponent(name);
-        const symbol = component && component.serializeGroupSymbol;
+    };
+    Serializer.prototype.removeComponent = function (name) {
+        var component = _super.prototype.removeComponent.call(this, name);
+        var symbol = component && component.serializeGroupSymbol;
         if (symbol) {
-            const values = Array.from(this.router.values());
-            for (let i = 0, len = values.length; i < len; i++) {
-                const idx = values[i].group.findIndex(o => o === symbol);
+            var values = Array.from(this.router.values());
+            for (var i = 0, len = values.length; i < len; i++) {
+                var idx = values[i].group.findIndex(function (o) { return o === symbol; });
                 if (idx > -1) {
                     values[i].group.splice(idx, 1);
                     break;
@@ -45,38 +62,41 @@ let Serializer = Serializer_1 = class Serializer extends utils_1.ChildableCompon
             }
         }
         return component;
-    }
-    removeAllComponents() {
-        super.removeAllComponents();
+    };
+    Serializer.prototype.removeAllComponents = function () {
+        _super.prototype.removeAllComponents.call(this);
         this.router = new Map();
         this.routes = [];
-    }
-    toObject(value, obj) {
+    };
+    Serializer.prototype.toObject = function (value, obj) {
         return this.findRoutes(value)
-            .reduce((result, curr) => curr.toObject(value, result), obj);
-    }
-    projectToObject(value, eventData) {
-        const eventBegin = new events_1.SerializeEvent(Serializer_1.EVENT_BEGIN, value);
+            .reduce(function (result, curr) { return curr.toObject(value, result); }, obj);
+    };
+    Serializer.prototype.projectToObject = function (value, eventData) {
+        var eventBegin = new events_1.SerializeEvent(Serializer_1.EVENT_BEGIN);
         if (eventData && eventData.begin) {
             Object.assign(eventBegin, eventData.begin);
         }
-        let project = eventBegin.output = {};
+        eventBegin.project = value;
+        var project = eventBegin.output = {};
         this.trigger(eventBegin);
         project = this.toObject(value, project);
-        const eventEnd = new events_1.SerializeEvent(Serializer_1.EVENT_END, value);
+        var eventEnd = new events_1.SerializeEvent(Serializer_1.EVENT_END);
         if (eventData && eventData.end) {
             Object.assign(eventEnd, eventData.end);
         }
+        eventEnd.project = value;
         eventEnd.output = project;
         this.trigger(eventEnd);
         return project;
-    }
-    findRoutes(value) {
-        const routes = [];
-        for (let i = 0, len = this.routes.length; i < len; i++) {
+    };
+    Serializer.prototype.findRoutes = function (value) {
+        var routes = [];
+        for (var i = 0, len = this.routes.length; i < len; i++) {
             if (this.routes[i](value)) {
-                const serializers = this.router.get(this.routes[i]).group;
-                for (let serializer of serializers) {
+                var serializers = this.router.get(this.routes[i]).group;
+                for (var _i = 0, serializers_1 = serializers; _i < serializers_1.length; _i++) {
+                    var serializer = serializers_1[_i];
                     if (serializer.supports(value)) {
                         routes.push(serializer);
                     }
@@ -84,12 +104,14 @@ let Serializer = Serializer_1 = class Serializer extends utils_1.ChildableCompon
             }
         }
         return routes;
-    }
-};
-Serializer.EVENT_BEGIN = 'begin';
-Serializer.EVENT_END = 'end';
-Serializer = Serializer_1 = __decorate([
-    component_1.Component({ name: 'serializer', internal: true, childClass: components_1.SerializerComponent })
-], Serializer);
+    };
+    var Serializer_1;
+    Serializer.EVENT_BEGIN = 'begin';
+    Serializer.EVENT_END = 'end';
+    Serializer = Serializer_1 = __decorate([
+        component_1.Component({ name: 'serializer', internal: true, childClass: components_1.SerializerComponent })
+    ], Serializer);
+    return Serializer;
+}(utils_1.ChildableComponent));
 exports.Serializer = Serializer;
 //# sourceMappingURL=serializer.js.map

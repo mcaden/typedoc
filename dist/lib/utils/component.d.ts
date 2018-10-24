@@ -2,7 +2,7 @@ import { Application } from '../application';
 import { EventDispatcher, Event, EventMap } from './events';
 import { DeclarationOption } from './options/declaration';
 export interface ComponentHost {
-    readonly application: Application;
+    application: Application;
 }
 export interface Component extends AbstractComponent<ComponentHost> {
 }
@@ -23,12 +23,11 @@ export declare class ComponentEvent extends Event {
     static REMOVED: string;
     constructor(name: string, owner: ComponentHost, component: AbstractComponent<ComponentHost>);
 }
-export declare const DUMMY_APPLICATION_OWNER: unique symbol;
 export declare abstract class AbstractComponent<O extends ComponentHost> extends EventDispatcher implements ComponentHost {
     private _componentOwner;
     componentName: string;
-    private _componentOptions?;
-    constructor(owner: O | typeof DUMMY_APPLICATION_OWNER);
+    private _componentOptions;
+    constructor(owner: O);
     protected initialize(): void;
     protected bubble(name: Event | EventMap | string, ...args: any[]): this;
     getOptionDeclarations(): DeclarationOption[];
@@ -36,13 +35,13 @@ export declare abstract class AbstractComponent<O extends ComponentHost> extends
     readonly owner: O;
 }
 export declare abstract class ChildableComponent<O extends ComponentHost, C extends Component> extends AbstractComponent<O> {
-    private _componentChildren?;
-    private _defaultComponents?;
-    constructor(owner: O | typeof DUMMY_APPLICATION_OWNER);
-    getComponent(name: string): C | undefined;
+    private _componentChildren;
+    private _defaultComponents;
+    constructor(owner: O);
+    getComponent(name: string): C;
     getComponents(): C[];
     hasComponent(name: string): boolean;
-    addComponent<T extends C>(name: string, componentClass: T | ComponentClass<T, O>): T;
-    removeComponent(name: string): C | undefined;
+    addComponent<T extends C & Component>(name: string, componentClass: T | ComponentClass<T, O>): T;
+    removeComponent(name: string): C;
     removeAllComponents(): void;
 }

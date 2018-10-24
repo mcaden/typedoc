@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,27 +19,46 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const index_1 = require("../../models/types/index");
-const components_1 = require("../components");
-let TupleConverter = class TupleConverter extends components_1.ConverterTypeComponent {
-    supportsNode(context, node) {
+var ts = require("typescript");
+var index_1 = require("../../models/types/index");
+var components_1 = require("../components");
+var TupleConverter = (function (_super) {
+    __extends(TupleConverter, _super);
+    function TupleConverter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    TupleConverter.prototype.supportsNode = function (context, node) {
         return node.kind === ts.SyntaxKind.TupleType;
-    }
-    supportsType(context, type) {
+    };
+    TupleConverter.prototype.supportsType = function (context, type) {
         return !!(type.objectFlags & ts.ObjectFlags.Tuple);
-    }
-    convertNode(context, node) {
-        const elements = this.owner.convertTypes(context, node.elementTypes);
+    };
+    TupleConverter.prototype.convertNode = function (context, node) {
+        var _this = this;
+        var elements;
+        if (node.elementTypes) {
+            elements = node.elementTypes.map(function (n) { return _this.owner.convertType(context, n); });
+        }
+        else {
+            elements = [];
+        }
         return new index_1.TupleType(elements);
-    }
-    convertType(context, type) {
-        const elements = this.owner.convertTypes(context, undefined, type.typeArguments);
+    };
+    TupleConverter.prototype.convertType = function (context, type) {
+        var _this = this;
+        var elements;
+        if (type.typeArguments) {
+            elements = type.typeArguments.map(function (t) { return _this.owner.convertType(context, null, t); });
+        }
+        else {
+            elements = [];
+        }
         return new index_1.TupleType(elements);
-    }
-};
-TupleConverter = __decorate([
-    components_1.Component({ name: 'type:tuple' })
-], TupleConverter);
+    };
+    TupleConverter = __decorate([
+        components_1.Component({ name: 'type:tuple' })
+    ], TupleConverter);
+    return TupleConverter;
+}(components_1.ConverterTypeComponent));
 exports.TupleConverter = TupleConverter;
 //# sourceMappingURL=tuple.js.map

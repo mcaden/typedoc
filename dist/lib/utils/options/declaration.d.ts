@@ -22,27 +22,24 @@ export interface DeclarationOption {
     type?: ParameterType;
     hint?: ParameterHint;
     scope?: ParameterScope;
-    map?: 'object' | Map<string | number, any> | {
-        [key: string]: any;
-    };
+    map?: {};
     mapError?: string;
     defaultValue?: any;
     convert?: (param: OptionDeclaration, value?: any) => any;
 }
 export declare class OptionDeclaration {
     name: string;
-    component?: string;
-    short?: string;
+    short: string;
+    component: string;
     help: string;
     type: ParameterType;
-    hint?: ParameterHint;
+    hint: ParameterHint;
     scope: ParameterScope;
-    protected map?: {
-        [k: string]: any;
-    } | 'object';
-    mapError?: string;
+    protected map: Object | Map<string, any> | 'object';
+    mapError: string;
+    isArray: boolean;
     defaultValue: any;
     constructor(data: DeclarationOption);
     getNames(): string[];
-    convert(value: unknown, errorCallback?: (format: string, ...args: string[]) => void): any;
+    convert(value: any, errorCallback?: Function): any;
 }

@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,11 +19,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typescript = require("typescript");
-const application_1 = require("./application");
-const component_1 = require("./utils/component");
-const declaration_1 = require("./utils/options/declaration");
-const help_1 = require("./utils/options/help");
+var typescript = require("typescript");
+var application_1 = require("./application");
+var component_1 = require("./utils/component");
+var declaration_1 = require("./utils/options/declaration");
+var help_1 = require("./utils/options/help");
 var ExitCode;
 (function (ExitCode) {
     ExitCode[ExitCode["OptionError"] = 1] = "OptionError";
@@ -19,11 +32,16 @@ var ExitCode;
     ExitCode[ExitCode["CompileError"] = 4] = "CompileError";
     ExitCode[ExitCode["OutputError"] = 5] = "OutputError";
 })(ExitCode = exports.ExitCode || (exports.ExitCode = {}));
-class CliApplication extends application_1.Application {
-    bootstrap(options) {
-        const result = super.bootstrap(options);
+var CliApplication = (function (_super) {
+    __extends(CliApplication, _super);
+    function CliApplication() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CliApplication.prototype.bootstrap = function (options) {
+        var result = _super.prototype.bootstrap.call(this, options);
         if (result.hasErrors) {
-            return process.exit(1);
+            process.exit(1);
+            return;
         }
         if (this.version) {
             typescript.sys.write(this.toString());
@@ -40,8 +58,8 @@ class CliApplication extends application_1.Application {
             process.exit(3);
         }
         else {
-            const src = this.expandInputFiles(result.inputFiles);
-            const project = this.convert(src);
+            var src = this.expandInputFiles(result.inputFiles);
+            var project = this.convert(src);
             if (project) {
                 if (this.out) {
                     this.generateDocs(project, this.out);
@@ -58,40 +76,45 @@ class CliApplication extends application_1.Application {
             }
         }
         return result;
-    }
-    get isCLI() {
-        return true;
-    }
-}
-__decorate([
-    component_1.Option({
-        name: 'out',
-        help: 'Specifies the location the documentation should be written to.',
-        hint: declaration_1.ParameterHint.Directory
-    })
-], CliApplication.prototype, "out", void 0);
-__decorate([
-    component_1.Option({
-        name: 'json',
-        help: 'Specifies the location and file name a json file describing the project is written to.',
-        hint: declaration_1.ParameterHint.File
-    })
-], CliApplication.prototype, "json", void 0);
-__decorate([
-    component_1.Option({
-        name: 'version',
-        short: 'v',
-        help: 'Print the TypeDoc\'s version.',
-        type: declaration_1.ParameterType.Boolean
-    })
-], CliApplication.prototype, "version", void 0);
-__decorate([
-    component_1.Option({
-        name: 'help',
-        short: 'h',
-        help: 'Print this message.',
-        type: declaration_1.ParameterType.Boolean
-    })
-], CliApplication.prototype, "help", void 0);
+    };
+    Object.defineProperty(CliApplication.prototype, "isCLI", {
+        get: function () {
+            return true;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    __decorate([
+        component_1.Option({
+            name: 'out',
+            help: 'Specifies the location the documentation should be written to.',
+            hint: declaration_1.ParameterHint.Directory
+        })
+    ], CliApplication.prototype, "out", void 0);
+    __decorate([
+        component_1.Option({
+            name: 'json',
+            help: 'Specifies the location and file name a json file describing the project is written to.',
+            hint: declaration_1.ParameterHint.File
+        })
+    ], CliApplication.prototype, "json", void 0);
+    __decorate([
+        component_1.Option({
+            name: 'version',
+            short: 'v',
+            help: 'Print the TypeDoc\'s version.',
+            type: declaration_1.ParameterType.Boolean
+        })
+    ], CliApplication.prototype, "version", void 0);
+    __decorate([
+        component_1.Option({
+            name: 'help',
+            short: 'h',
+            help: 'Print this message.',
+            type: declaration_1.ParameterType.Boolean
+        })
+    ], CliApplication.prototype, "help", void 0);
+    return CliApplication;
+}(application_1.Application));
 exports.CliApplication = CliApplication;
 //# sourceMappingURL=cli.js.map

@@ -1,6 +1,6 @@
 import { TypeParameterReflection } from '../../../models';
 import { ReflectionSerializerComponent } from '../../components';
 export declare class TypeParameterReflectionSerializer extends ReflectionSerializerComponent<TypeParameterReflection> {
-    supports(t: unknown): boolean;
+    initialize(): void;
     toObject(typeParameter: TypeParameterReflection, obj?: any): any;
 }

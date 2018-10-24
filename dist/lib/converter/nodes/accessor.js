@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,21 +19,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const index_1 = require("../../models/index");
-const index_2 = require("../factories/index");
-const components_1 = require("../components");
-let AccessorConverter = class AccessorConverter extends components_1.ConverterNodeComponent {
-    constructor() {
-        super(...arguments);
-        this.supports = [
+var ts = require("typescript");
+var index_1 = require("../../models/index");
+var index_2 = require("../factories/index");
+var components_1 = require("../components");
+var AccessorConverter = (function (_super) {
+    __extends(AccessorConverter, _super);
+    function AccessorConverter() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.supports = [
             ts.SyntaxKind.GetAccessor,
             ts.SyntaxKind.SetAccessor
         ];
+        return _this;
     }
-    convert(context, node) {
-        const accessor = index_2.createDeclaration(context, node, index_1.ReflectionKind.Accessor);
-        context.withScope(accessor, () => {
+    AccessorConverter.prototype.convert = function (context, node) {
+        var accessor = index_2.createDeclaration(context, node, index_1.ReflectionKind.Accessor);
+        context.withScope(accessor, function () {
             if (node.kind === ts.SyntaxKind.GetAccessor) {
                 accessor.getSignature = index_2.createSignature(context, node, '__get', index_1.ReflectionKind.GetSignature);
             }
@@ -29,10 +44,11 @@ let AccessorConverter = class AccessorConverter extends components_1.ConverterNo
             }
         });
         return accessor;
-    }
-};
-AccessorConverter = __decorate([
-    components_1.Component({ name: 'node:accessor' })
-], AccessorConverter);
+    };
+    AccessorConverter = __decorate([
+        components_1.Component({ name: 'node:accessor' })
+    ], AccessorConverter);
+    return AccessorConverter;
+}(components_1.ConverterNodeComponent));
 exports.AccessorConverter = AccessorConverter;
 //# sourceMappingURL=accessor.js.map

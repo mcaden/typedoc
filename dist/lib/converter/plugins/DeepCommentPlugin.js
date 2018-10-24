@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,25 +19,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("../../models/reflections/index");
-const index_2 = require("../../models/comments/index");
-const components_1 = require("../components");
-const converter_1 = require("../converter");
-let DeepCommentPlugin = class DeepCommentPlugin extends components_1.ConverterComponent {
-    initialize() {
-        this.listenTo(this.owner, converter_1.Converter.EVENT_RESOLVE_BEGIN, this.onBeginResolve, 512);
+var index_1 = require("../../models/reflections/index");
+var index_2 = require("../../models/comments/index");
+var components_1 = require("../components");
+var converter_1 = require("../converter");
+var DeepCommentPlugin = (function (_super) {
+    __extends(DeepCommentPlugin, _super);
+    function DeepCommentPlugin() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    onBeginResolve(context) {
-        const project = context.project;
-        let name;
-        for (let key in project.reflections) {
-            const reflection = project.reflections[key];
+    DeepCommentPlugin.prototype.initialize = function () {
+        this.listenTo(this.owner, converter_1.Converter.EVENT_RESOLVE_BEGIN, this.onBeginResolve, 512);
+    };
+    DeepCommentPlugin.prototype.onBeginResolve = function (context) {
+        var project = context.project;
+        var name;
+        for (var key in project.reflections) {
+            var reflection = project.reflections[key];
             if (!reflection.comment) {
                 findDeepComment(reflection);
             }
         }
         function push(parent) {
-            let part = parent.originalName;
+            var part = parent.originalName;
             if (!part || part.substr(0, 2) === '__' || parent instanceof index_1.SignatureReflection) {
                 part = '';
             }
@@ -35,11 +52,11 @@ let DeepCommentPlugin = class DeepCommentPlugin extends components_1.ConverterCo
         function findDeepComment(reflection) {
             name = '';
             push(reflection);
-            let target = reflection.parent;
+            var target = reflection.parent;
             while (target && !(target instanceof index_1.ProjectReflection)) {
                 push(target);
                 if (target.comment) {
-                    let tag;
+                    var tag = void 0;
                     if (reflection instanceof index_1.TypeParameterReflection) {
                         tag = target.comment.getTag('typeparam', reflection.name);
                         if (!tag) {
@@ -58,10 +75,11 @@ let DeepCommentPlugin = class DeepCommentPlugin extends components_1.ConverterCo
                 target = target.parent;
             }
         }
-    }
-};
-DeepCommentPlugin = __decorate([
-    components_1.Component({ name: 'deep-comment' })
-], DeepCommentPlugin);
+    };
+    DeepCommentPlugin = __decorate([
+        components_1.Component({ name: 'deep-comment' })
+    ], DeepCommentPlugin);
+    return DeepCommentPlugin;
+}(components_1.ConverterComponent));
 exports.DeepCommentPlugin = DeepCommentPlugin;
 //# sourceMappingURL=DeepCommentPlugin.js.map

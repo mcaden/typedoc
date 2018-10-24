@@ -1,125 +1,134 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const FS = require("fs");
-const Path = require("path");
-const Util = require("util");
+var FS = require("fs");
+var Path = require("path");
+var Util = require("util");
 function normalizeName(name) {
     return name.replace('\\', '/').replace(/\.\w+$/, '');
 }
-class Resource {
-    constructor(origin, name, fileName) {
+var Resource = (function () {
+    function Resource(origin, name, fileName) {
         this.origin = origin;
         this.name = name;
         this.fileName = fileName;
     }
-    getName() {
+    Resource.prototype.getName = function () {
         return this.name;
-    }
-}
+    };
+    return Resource;
+}());
 exports.Resource = Resource;
-class ResourceOrigin {
-    constructor(stack, name, path) {
+var ResourceOrigin = (function () {
+    function ResourceOrigin(stack, name, path) {
         this.resources = {};
         this.stack = stack;
         this.name = name;
         this.path = path;
         this.findResources();
     }
-    mergeResources(target) {
-        const resources = this.resources;
-        for (let name in resources) {
-            if (name in target) {
+    ResourceOrigin.prototype.mergeResources = function (target) {
+        var resources = this.resources;
+        for (var name_1 in resources) {
+            if (name_1 in target) {
                 continue;
             }
-            target[name] = resources[name];
+            target[name_1] = resources[name_1];
         }
-    }
-    hasResource(name) {
+    };
+    ResourceOrigin.prototype.hasResource = function (name) {
         return name in this.resources;
-    }
-    getResource(name) {
-        return this.resources[name];
-    }
-    getName() {
+    };
+    ResourceOrigin.prototype.getResource = function (name) {
+        if (name in this.resources) {
+            return this.resources[name];
+        }
+        else {
+            return null;
+        }
+    };
+    ResourceOrigin.prototype.getName = function () {
         return this.name;
-    }
-    findResources(dir) {
-        const resourceClass = this.stack.getResourceClass();
-        const resourceRegExp = this.stack.getResourceRegExp();
-        let path = this.path;
+    };
+    ResourceOrigin.prototype.findResources = function (dir) {
+        var resourceClass = this.stack.getResourceClass();
+        var ressourceRegExp = this.stack.getRessourceRegExp();
+        var path = this.path;
         if (dir) {
             path = Path.join(path, dir);
         }
-        for (let fileName of FS.readdirSync(path)) {
-            const fullName = Path.join(path, fileName);
+        for (var _i = 0, _a = FS.readdirSync(path); _i < _a.length; _i++) {
+            var fileName = _a[_i];
+            var fullName = Path.join(path, fileName);
             if (FS.statSync(fullName).isDirectory()) {
                 this.findResources(dir ? Path.join(dir, fileName) : fileName);
             }
-            else if (resourceRegExp.test(fileName)) {
-                const name = normalizeName(dir ? Path.join(dir, fileName) : fileName);
-                this.resources[name] = new resourceClass(this, name, fullName);
+            else if (ressourceRegExp.test(fileName)) {
+                var name_2 = normalizeName(dir ? Path.join(dir, fileName) : fileName);
+                this.resources[name_2] = new resourceClass(this, name_2, fullName);
             }
         }
-    }
-}
+    };
+    return ResourceOrigin;
+}());
 exports.ResourceOrigin = ResourceOrigin;
-class ResourceStack {
-    constructor(resourceClass, resourceRegExp) {
-        this.isActive = false;
+var ResourceStack = (function () {
+    function ResourceStack(ressourceClass, ressourceRegExp) {
         this.origins = [];
-        this.resourceClass = resourceClass;
-        this.resourceRegExp = resourceRegExp || /.*/;
+        this.ressourceClass = ressourceClass;
+        this.ressourceRegExp = ressourceRegExp || /.*/;
     }
-    activate() {
+    ResourceStack.prototype.activate = function () {
         if (this.isActive) {
             return false;
         }
         this.isActive = true;
         return true;
-    }
-    deactivate() {
+    };
+    ResourceStack.prototype.deactivate = function () {
         if (!this.isActive) {
             return false;
         }
         this.isActive = false;
         return true;
-    }
-    getResource(name) {
-        const normalizedName = normalizeName(name);
-        let index = this.origins.length - 1;
+    };
+    ResourceStack.prototype.getResource = function (name) {
+        var normalizedName = normalizeName(name);
+        var index = this.origins.length - 1;
         while (index >= 0) {
-            const origin = this.origins[index--];
-            if (origin.hasResource(normalizedName)) {
-                return origin.getResource(normalizedName);
+            var origin_1 = this.origins[index--];
+            if (origin_1.hasResource(normalizedName)) {
+                return origin_1.getResource(normalizedName);
             }
         }
         throw new Error(Util.format('Cannot find resource `%s`.', name));
-    }
-    getAllResources() {
-        const resources = {};
-        let index = this.origins.length - 1;
+    };
+    ResourceStack.prototype.getAllResources = function () {
+        var resources = {};
+        var index = this.origins.length - 1;
         while (index >= 0) {
             this.origins[index--].mergeResources(resources);
         }
         return resources;
-    }
-    getResourceClass() {
-        return this.resourceClass;
-    }
-    getResourceRegExp() {
-        return this.resourceRegExp;
-    }
-    getOrigin(name) {
-        for (let origin of this.origins) {
-            if (origin.getName() === name) {
-                return origin;
+    };
+    ResourceStack.prototype.getResourceClass = function () {
+        return this.ressourceClass;
+    };
+    ResourceStack.prototype.getRessourceRegExp = function () {
+        return this.ressourceRegExp;
+    };
+    ResourceStack.prototype.getOrigin = function (name) {
+        for (var _i = 0, _a = this.origins; _i < _a.length; _i++) {
+            var origin_2 = _a[_i];
+            if (origin_2.getName() === name) {
+                return origin_2;
             }
         }
-    }
-    hasOrigin(name) {
-        return !!this.getOrigin(name);
-    }
-    addOrigin(name, path, ignoreErrors) {
+        return null;
+    };
+    ResourceStack.prototype.hasOrigin = function (name) {
+        return this.getOrigin(name) !== null;
+    };
+    ResourceStack.prototype.addOrigin = function (name, path, ignoreErrors) {
         if (this.isActive) {
             throw new Error('Cannot add origins while the resource is active.');
         }
@@ -140,15 +149,15 @@ class ResourceStack {
             return;
         }
         this.origins.push(new ResourceOrigin(this, name, path));
-    }
-    removeOrigin(name) {
+    };
+    ResourceStack.prototype.removeOrigin = function (name) {
         if (this.isActive) {
             throw new Error('Cannot remove origins while the resource is active.');
         }
-        let index = 0, count = this.origins.length;
+        var index = 0, count = this.origins.length;
         while (index < count) {
-            const origin = this.origins[index];
-            if (origin.getName() === name) {
+            var origin_3 = this.origins[index];
+            if (origin_3.getName() === name) {
                 this.origins.splice(index, 1);
                 count -= 1;
             }
@@ -156,13 +165,14 @@ class ResourceStack {
                 index += 1;
             }
         }
-    }
-    removeAllOrigins() {
+    };
+    ResourceStack.prototype.removeAllOrigins = function () {
         if (this.isActive) {
             throw new Error('Cannot remove origins while the resource is active.');
         }
         this.origins = [];
-    }
-}
+    };
+    return ResourceStack;
+}());
 exports.ResourceStack = ResourceStack;
 //# sourceMappingURL=stack.js.map

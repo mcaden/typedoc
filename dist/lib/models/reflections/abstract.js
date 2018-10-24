@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-let REFLECTION_ID = 0;
+var REFLECTION_ID = 0;
 function resetReflectionID() {
     REFLECTION_ID = 0;
 }
@@ -39,7 +39,6 @@ var ReflectionKind;
 })(ReflectionKind = exports.ReflectionKind || (exports.ReflectionKind = {}));
 var ReflectionFlag;
 (function (ReflectionFlag) {
-    ReflectionFlag[ReflectionFlag["None"] = 0] = "None";
     ReflectionFlag[ReflectionFlag["Private"] = 1] = "Private";
     ReflectionFlag[ReflectionFlag["Protected"] = 2] = "Protected";
     ReflectionFlag[ReflectionFlag["Public"] = 4] = "Public";
@@ -55,7 +54,7 @@ var ReflectionFlag;
     ReflectionFlag[ReflectionFlag["Const"] = 4096] = "Const";
     ReflectionFlag[ReflectionFlag["Let"] = 8192] = "Let";
 })(ReflectionFlag = exports.ReflectionFlag || (exports.ReflectionFlag = {}));
-const relevantFlags = [
+var relevantFlags = [
     ReflectionFlag.Private,
     ReflectionFlag.Protected,
     ReflectionFlag.Static,
@@ -67,101 +66,6 @@ const relevantFlags = [
     ReflectionFlag.Let,
     ReflectionFlag.Const
 ];
-class ReflectionFlags extends Array {
-    constructor() {
-        super(...arguments);
-        this.flags = ReflectionFlag.None;
-    }
-    hasFlag(flag) {
-        return (flag & this.flags) !== 0;
-    }
-    get isPrivate() {
-        return this.hasFlag(ReflectionFlag.Private);
-    }
-    get isProtected() {
-        return this.hasFlag(ReflectionFlag.Protected);
-    }
-    get isPublic() {
-        return this.hasFlag(ReflectionFlag.Public);
-    }
-    get isStatic() {
-        return this.hasFlag(ReflectionFlag.Static);
-    }
-    get isExported() {
-        return this.hasFlag(ReflectionFlag.Exported);
-    }
-    get isExternal() {
-        return this.hasFlag(ReflectionFlag.External);
-    }
-    get isOptional() {
-        return this.hasFlag(ReflectionFlag.Optional);
-    }
-    get isRest() {
-        return this.hasFlag(ReflectionFlag.Rest);
-    }
-    get hasExportAssignment() {
-        return this.hasFlag(ReflectionFlag.ExportAssignment);
-    }
-    get isConstructorProperty() {
-        return this.hasFlag(ReflectionFlag.ConstructorProperty);
-    }
-    get isAbstract() {
-        return this.hasFlag(ReflectionFlag.Abstract);
-    }
-    get isConst() {
-        return this.hasFlag(ReflectionFlag.Const);
-    }
-    get isLet() {
-        return this.hasFlag(ReflectionFlag.Let);
-    }
-    setFlag(flag, set) {
-        switch (flag) {
-            case ReflectionFlag.Private:
-                this.setSingleFlag(ReflectionFlag.Private, set);
-                if (set) {
-                    this.setFlag(ReflectionFlag.Protected, false);
-                    this.setFlag(ReflectionFlag.Public, false);
-                }
-                break;
-            case ReflectionFlag.Protected:
-                this.setSingleFlag(ReflectionFlag.Protected, set);
-                if (set) {
-                    this.setFlag(ReflectionFlag.Private, false);
-                    this.setFlag(ReflectionFlag.Public, false);
-                }
-                break;
-            case ReflectionFlag.Public:
-                this.setSingleFlag(ReflectionFlag.Public, set);
-                if (set) {
-                    this.setFlag(ReflectionFlag.Private, false);
-                    this.setFlag(ReflectionFlag.Protected, false);
-                }
-                break;
-            case ReflectionFlag.Const:
-            case ReflectionFlag.Let:
-                this.setSingleFlag(flag, set);
-                this.setSingleFlag((ReflectionFlag.Let | ReflectionFlag.Const) ^ flag, !set);
-            default:
-                this.setSingleFlag(flag, set);
-        }
-    }
-    setSingleFlag(flag, set) {
-        const name = ReflectionFlag[flag].replace(/(.)([A-Z])/g, (m, a, b) => a + ' ' + b.toLowerCase());
-        if (!set && this.hasFlag(flag)) {
-            if (relevantFlags.indexOf(flag) !== -1) {
-                this.splice(this.indexOf(name), 1);
-            }
-            this.flags ^= flag;
-        }
-        else if (set && !this.hasFlag(flag)) {
-            if (relevantFlags.indexOf(flag) !== -1) {
-                this.push(name);
-            }
-            this.flags |= flag;
-        }
-    }
-}
-exports.ReflectionFlags = ReflectionFlags;
 var TraverseProperty;
 (function (TraverseProperty) {
     TraverseProperty[TraverseProperty["Children"] = 0] = "Children";
@@ -173,45 +77,126 @@ var TraverseProperty;
     TraverseProperty[TraverseProperty["GetSignature"] = 6] = "GetSignature";
     TraverseProperty[TraverseProperty["SetSignature"] = 7] = "SetSignature";
 })(TraverseProperty = exports.TraverseProperty || (exports.TraverseProperty = {}));
-class Reflection {
-    constructor(name, kind, parent) {
+var Reflection = (function () {
+    function Reflection(parent, name, kind) {
         this.name = '';
-        this.flags = new ReflectionFlags();
+        this.flags = [];
         this.id = REFLECTION_ID++;
         this.parent = parent;
         this.name = name;
         this.originalName = name;
         this.kind = kind;
     }
-    kindOf(kind) {
-        const kindArray = Array.isArray(kind) ? kind : [kind];
-        return kindArray.some(kind => (this.kind & kind) !== 0);
-    }
-    getFullName(separator = '.') {
+    Reflection.prototype.kindOf = function (kind) {
+        if (Array.isArray(kind)) {
+            for (var i = 0, c = kind.length; i < c; i++) {
+                if ((this.kind & kind[i]) !== 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        else {
+            return (this.kind & kind) !== 0;
+        }
+    };
+    Reflection.prototype.getFullName = function (separator) {
+        if (separator === void 0) { separator = '.'; }
         if (this.parent && !this.parent.isProject()) {
             return this.parent.getFullName(separator) + separator + this.name;
         }
         else {
             return this.name;
         }
-    }
-    setFlag(flag, value = true) {
-        this.flags.setFlag(flag, value);
-    }
-    getAlias() {
+    };
+    Reflection.prototype.setFlag = function (flag, value) {
+        if (value === void 0) { value = true; }
+        var name, index;
+        if (relevantFlags.indexOf(flag) !== -1) {
+            name = ReflectionFlag[flag];
+            name = name.replace(/(.)([A-Z])/g, function (m, a, b) { return a + ' ' + b.toLowerCase(); });
+            index = this.flags.indexOf(name);
+        }
+        if (value) {
+            this.flags.flags |= flag;
+            if (name && index === -1) {
+                this.flags.push(name);
+            }
+        }
+        else {
+            this.flags.flags &= ~flag;
+            if (name && index !== -1) {
+                this.flags.splice(index, 1);
+            }
+        }
+        switch (flag) {
+            case ReflectionFlag.Private:
+                this.flags.isPrivate = value;
+                if (value) {
+                    this.setFlag(ReflectionFlag.Protected, false);
+                    this.setFlag(ReflectionFlag.Public, false);
+                }
+                break;
+            case ReflectionFlag.Protected:
+                this.flags.isProtected = value;
+                if (value) {
+                    this.setFlag(ReflectionFlag.Private, false);
+                    this.setFlag(ReflectionFlag.Public, false);
+                }
+                break;
+            case ReflectionFlag.Public:
+                this.flags.isPublic = value;
+                if (value) {
+                    this.setFlag(ReflectionFlag.Private, false);
+                    this.setFlag(ReflectionFlag.Protected, false);
+                }
+                break;
+            case ReflectionFlag.Static:
+                this.flags.isStatic = value;
+                break;
+            case ReflectionFlag.Exported:
+                this.flags.isExported = value;
+                break;
+            case ReflectionFlag.External:
+                this.flags.isExternal = value;
+                break;
+            case ReflectionFlag.Optional:
+                this.flags.isOptional = value;
+                break;
+            case ReflectionFlag.Rest:
+                this.flags.isRest = value;
+                break;
+            case ReflectionFlag.ExportAssignment:
+                this.flags.hasExportAssignment = value;
+                break;
+            case ReflectionFlag.ConstructorProperty:
+                this.flags.isConstructorProperty = value;
+                break;
+            case ReflectionFlag.Abstract:
+                this.flags.isAbstract = value;
+                break;
+            case ReflectionFlag.Let:
+                this.flags.isLet = value;
+                break;
+            case ReflectionFlag.Const:
+                this.flags.isConst = value;
+                break;
+        }
+    };
+    Reflection.prototype.getAlias = function () {
         if (!this._alias) {
-            let alias = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            var alias = this.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             if (alias === '') {
                 alias = 'reflection-' + this.id;
             }
-            let target = this;
+            var target = this;
             while (target.parent && !target.parent.isProject() && !target.hasOwnDocument) {
                 target = target.parent;
             }
             if (!target._aliases) {
                 target._aliases = [];
             }
-            let suffix = '', index = 0;
+            var suffix = '', index = 0;
             while (target._aliases.indexOf(alias + suffix) !== -1) {
                 suffix = '-' + (++index).toString();
             }
@@ -220,18 +205,18 @@ class Reflection {
             this._alias = alias;
         }
         return this._alias;
-    }
-    hasComment() {
-        return this.comment ? this.comment.hasVisibleComponent() : false;
-    }
-    hasGetterOrSetter() {
+    };
+    Reflection.prototype.hasComment = function () {
+        return this.comment && this.comment.hasVisibleComponent();
+    };
+    Reflection.prototype.hasGetterOrSetter = function () {
         return false;
-    }
-    getChildByName(arg) {
-        const names = Array.isArray(arg) ? arg : arg.split('.');
-        const name = names[0];
-        let result;
-        this.traverse((child) => {
+    };
+    Reflection.prototype.getChildByName = function (arg) {
+        var names = Array.isArray(arg) ? arg : arg.split('.');
+        var name = names[0];
+        var result = null;
+        this.traverse(function (child) {
             if (child.name === name) {
                 if (names.length <= 1) {
                     result = child;
@@ -242,23 +227,23 @@ class Reflection {
             }
         });
         return result;
-    }
-    isProject() {
+    };
+    Reflection.prototype.isProject = function () {
         return false;
-    }
-    findReflectionByName(arg) {
-        const names = Array.isArray(arg) ? arg : arg.split('.');
-        const reflection = this.getChildByName(names);
+    };
+    Reflection.prototype.findReflectionByName = function (arg) {
+        var names = Array.isArray(arg) ? arg : arg.split('.');
+        var reflection = this.getChildByName(names);
         if (reflection) {
             return reflection;
         }
-        else if (this.parent) {
+        else {
             return this.parent.findReflectionByName(names);
         }
-    }
-    traverse(callback) { }
-    toObject() {
-        const result = {
+    };
+    Reflection.prototype.traverse = function (callback) { };
+    Reflection.prototype.toObject = function () {
+        var result = {
             id: this.id,
             name: this.name,
             kind: this.kind,
@@ -271,18 +256,20 @@ class Reflection {
         if (this.comment) {
             result.comment = this.comment.toObject();
         }
-        Object.getOwnPropertyNames(ReflectionFlags.prototype).forEach(name => {
-            const descriptor = Object.getOwnPropertyDescriptor(ReflectionFlags.prototype, name);
-            if (typeof descriptor.get === 'function' && this.flags[name] === true) {
-                result.flags[name] = true;
+        for (var key in this.flags) {
+            if (parseInt(key, 10) == key || key === 'flags') {
+                continue;
             }
-        });
+            if (this.flags[key]) {
+                result.flags[key] = true;
+            }
+        }
         if (this.decorates) {
-            result.decorates = this.decorates.map((type) => type.toObject());
+            result.decorates = this.decorates.map(function (type) { return type.toObject(); });
         }
         if (this.decorators) {
-            result.decorators = this.decorators.map((decorator) => {
-                const result = { name: decorator.name };
+            result.decorators = this.decorators.map(function (decorator) {
+                var result = { name: decorator.name };
                 if (decorator.type) {
                     result.type = decorator.type.toObject();
                 }
@@ -292,11 +279,11 @@ class Reflection {
                 return result;
             });
         }
-        this.traverse((child, property) => {
+        this.traverse(function (child, property) {
             if (property === TraverseProperty.TypeLiteral) {
                 return;
             }
-            let name = TraverseProperty[property];
+            var name = TraverseProperty[property];
             name = name.substr(0, 1).toLowerCase() + name.substr(1);
             if (!result[name]) {
                 result[name] = [];
@@ -304,18 +291,20 @@ class Reflection {
             result[name].push(child.toObject());
         });
         return result;
-    }
-    toString() {
+    };
+    Reflection.prototype.toString = function () {
         return ReflectionKind[this.kind] + ' ' + this.name;
-    }
-    toStringHierarchy(indent = '') {
-        const lines = [indent + this.toString()];
+    };
+    Reflection.prototype.toStringHierarchy = function (indent) {
+        if (indent === void 0) { indent = ''; }
+        var lines = [indent + this.toString()];
         indent += '  ';
-        this.traverse((child, property) => {
+        this.traverse(function (child, property) {
             lines.push(child.toStringHierarchy(indent));
         });
         return lines.join('\n');
-    }
-}
+    };
+    return Reflection;
+}());
 exports.Reflection = Reflection;
 //# sourceMappingURL=abstract.js.map

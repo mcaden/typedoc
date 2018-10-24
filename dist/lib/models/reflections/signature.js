@@ -1,31 +1,45 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("../types/index");
-const abstract_1 = require("./abstract");
-class SignatureReflection extends abstract_1.Reflection {
-    getParameterTypes() {
+var index_1 = require("../types/index");
+var abstract_1 = require("./abstract");
+var SignatureReflection = (function (_super) {
+    __extends(SignatureReflection, _super);
+    function SignatureReflection() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    SignatureReflection.prototype.getParameterTypes = function () {
         if (!this.parameters) {
             return [];
         }
-        function notUndefined(t) {
-            return !!t;
-        }
-        return this.parameters.map(parameter => parameter.type).filter(notUndefined);
-    }
-    traverse(callback) {
+        return this.parameters.map(function (parameter) { return parameter.type; });
+    };
+    SignatureReflection.prototype.traverse = function (callback) {
         if (this.type instanceof index_1.ReflectionType) {
             callback(this.type.declaration, abstract_1.TraverseProperty.TypeLiteral);
         }
         if (this.typeParameters) {
-            this.typeParameters.slice().forEach((parameter) => callback(parameter, abstract_1.TraverseProperty.TypeParameter));
+            this.typeParameters.slice().forEach(function (parameter) { return callback(parameter, abstract_1.TraverseProperty.TypeParameter); });
         }
         if (this.parameters) {
-            this.parameters.slice().forEach((parameter) => callback(parameter, abstract_1.TraverseProperty.Parameters));
+            this.parameters.slice().forEach(function (parameter) { return callback(parameter, abstract_1.TraverseProperty.Parameters); });
         }
-        super.traverse(callback);
-    }
-    toObject() {
-        const result = super.toObject();
+        _super.prototype.traverse.call(this, callback);
+    };
+    SignatureReflection.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         if (this.type) {
             result.type = this.type.toObject();
         }
@@ -39,19 +53,20 @@ class SignatureReflection extends abstract_1.Reflection {
             result.implementationOf = this.implementationOf.toObject();
         }
         return result;
-    }
-    toString() {
-        let result = super.toString();
+    };
+    SignatureReflection.prototype.toString = function () {
+        var result = _super.prototype.toString.call(this);
         if (this.typeParameters) {
-            const parameters = [];
-            this.typeParameters.forEach((parameter) => parameters.push(parameter.name));
-            result += '<' + parameters.join(', ') + '>';
+            var parameters_1 = [];
+            this.typeParameters.forEach(function (parameter) { return parameters_1.push(parameter.name); });
+            result += '<' + parameters_1.join(', ') + '>';
         }
         if (this.type) {
             result += ':' + this.type.toString();
         }
         return result;
-    }
-}
+    };
+    return SignatureReflection;
+}(abstract_1.Reflection));
 exports.SignatureReflection = SignatureReflection;
 //# sourceMappingURL=signature.js.map

@@ -1,11 +1,24 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const _ = require("lodash");
-const events_1 = require("./events");
-const childMappings = [];
+var _ = require("lodash");
+var events_1 = require("./events");
+var childMappings = [];
 function Component(options) {
-    return (target) => {
-        const proto = target.prototype;
+    return function (target) {
+        var proto = target.prototype;
         if (!(proto instanceof AbstractComponent)) {
             throw new Error('The `Component` decorator can only be used with a subclass of `AbstractComponent`.');
         }
@@ -18,19 +31,20 @@ function Component(options) {
                 child: options.childClass
             });
         }
-        const name = options.name;
+        var name = options.name;
         if (name) {
             proto.componentName = name;
         }
-        const internal = !!options.internal;
+        var internal = !!options.internal;
         if (name && !internal) {
-            for (const childMapping of childMappings) {
+            for (var _i = 0, childMappings_1 = childMappings; _i < childMappings_1.length; _i++) {
+                var childMapping = childMappings_1[_i];
                 if (!(proto instanceof childMapping.child)) {
                     continue;
                 }
-                const host = childMapping.host;
-                host['_defaultComponents'] = host['_defaultComponents'] || {};
-                host['_defaultComponents'][name] = target;
+                var host = childMapping.host;
+                var defaults = host._defaultComponents || (host._defaultComponents = {});
+                defaults[name] = target;
                 break;
             }
         }
@@ -42,9 +56,9 @@ function Option(options) {
         if (!(target instanceof AbstractComponent)) {
             throw new Error('The `Option` decorator can only be used on properties within an `AbstractComponent` subclass.');
         }
+        var list = target['_componentOptions'] || (target['_componentOptions'] = []);
         options.component = target['_componentName'];
-        target['_componentOptions'] = target['_componentOptions'] || [];
-        target['_componentOptions'].push(options);
+        list.push(options);
         Object.defineProperty(target, propertyKey, {
             get: function () {
                 return this.application.options.getValue(options.name);
@@ -55,63 +69,89 @@ function Option(options) {
     };
 }
 exports.Option = Option;
-class ComponentEvent extends events_1.Event {
-    constructor(name, owner, component) {
-        super(name);
-        this.owner = owner;
-        this.component = component;
+var ComponentEvent = (function (_super) {
+    __extends(ComponentEvent, _super);
+    function ComponentEvent(name, owner, component) {
+        var _this = _super.call(this, name) || this;
+        _this.owner = owner;
+        _this.component = component;
+        return _this;
     }
-}
-ComponentEvent.ADDED = 'componentAdded';
-ComponentEvent.REMOVED = 'componentRemoved';
+    ComponentEvent.ADDED = 'componentAdded';
+    ComponentEvent.REMOVED = 'componentRemoved';
+    return ComponentEvent;
+}(events_1.Event));
 exports.ComponentEvent = ComponentEvent;
-exports.DUMMY_APPLICATION_OWNER = Symbol();
-class AbstractComponent extends events_1.EventDispatcher {
-    constructor(owner) {
-        super();
-        this._componentOwner = owner;
-        this.initialize();
+var AbstractComponent = (function (_super) {
+    __extends(AbstractComponent, _super);
+    function AbstractComponent(owner) {
+        var _this = _super.call(this) || this;
+        _this._componentOwner = owner;
+        _this.initialize();
+        return _this;
     }
-    initialize() { }
-    bubble(name, ...args) {
-        super.trigger(name, ...args);
-        if (this.owner instanceof AbstractComponent && this._componentOwner !== exports.DUMMY_APPLICATION_OWNER) {
-            this.owner.bubble(name, ...args);
+    AbstractComponent.prototype.initialize = function () { };
+    AbstractComponent.prototype.bubble = function (name) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        _super.prototype.trigger.apply(this, arguments);
+        var owner = this.owner;
+        if (owner instanceof AbstractComponent) {
+            owner.bubble.apply(this._componentOwner, arguments);
         }
         return this;
-    }
-    getOptionDeclarations() {
-        return (this._componentOptions || []).slice();
-    }
-    get application() {
-        return this._componentOwner === exports.DUMMY_APPLICATION_OWNER
-            ? this
-            : this._componentOwner.application;
-    }
-    get owner() {
-        return this._componentOwner === exports.DUMMY_APPLICATION_OWNER
-            ? this
-            : this._componentOwner;
-    }
-}
+    };
+    AbstractComponent.prototype.getOptionDeclarations = function () {
+        return this._componentOptions ? this._componentOptions.slice() : [];
+    };
+    Object.defineProperty(AbstractComponent.prototype, "application", {
+        get: function () {
+            if (this._componentOwner) {
+                return this._componentOwner.application;
+            }
+            else {
+                return null;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AbstractComponent.prototype, "owner", {
+        get: function () {
+            return this._componentOwner;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return AbstractComponent;
+}(events_1.EventDispatcher));
 exports.AbstractComponent = AbstractComponent;
-class ChildableComponent extends AbstractComponent {
-    constructor(owner) {
-        super(owner);
-        _.entries(this._defaultComponents || {}).forEach(([name, component]) => {
-            this.addComponent(name, component);
-        });
+var ChildableComponent = (function (_super) {
+    __extends(ChildableComponent, _super);
+    function ChildableComponent(owner) {
+        var _this = _super.call(this, owner) || this;
+        for (var name_1 in _this._defaultComponents) {
+            _this.addComponent(name_1, _this._defaultComponents[name_1]);
+        }
+        return _this;
     }
-    getComponent(name) {
-        return (this._componentChildren || {})[name];
-    }
-    getComponents() {
+    ChildableComponent.prototype.getComponent = function (name) {
+        if (this._componentChildren && this._componentChildren[name]) {
+            return this._componentChildren[name];
+        }
+        else {
+            return null;
+        }
+    };
+    ChildableComponent.prototype.getComponents = function () {
         return _.values(this._componentChildren);
-    }
-    hasComponent(name) {
-        return !!(this._componentChildren || {})[name];
-    }
-    addComponent(name, componentClass) {
+    };
+    ChildableComponent.prototype.hasComponent = function (name) {
+        return !!(this._componentChildren && this._componentChildren[name]);
+    };
+    ChildableComponent.prototype.addComponent = function (name, componentClass) {
         if (!this._componentChildren) {
             this._componentChildren = {};
         }
@@ -119,30 +159,40 @@ class ChildableComponent extends AbstractComponent {
             return this._componentChildren[name];
         }
         else {
-            const component = typeof componentClass === 'function'
+            var component = typeof componentClass === 'function'
                 ? new componentClass(this)
                 : componentClass;
-            const event = new ComponentEvent(ComponentEvent.ADDED, this, component);
-            this.bubble(event);
+            var event_1 = new ComponentEvent(ComponentEvent.ADDED, this, component);
+            this.bubble(event_1);
             this._componentChildren[name] = component;
             return component;
         }
-    }
-    removeComponent(name) {
-        const component = (this._componentChildren || {})[name];
+    };
+    ChildableComponent.prototype.removeComponent = function (name) {
+        if (!this._componentChildren) {
+            return null;
+        }
+        var component = this._componentChildren[name];
         if (component) {
             delete this._componentChildren[name];
             component.stopListening();
             this.bubble(new ComponentEvent(ComponentEvent.REMOVED, this, component));
             return component;
         }
-    }
-    removeAllComponents() {
-        for (const component of _.values(this._componentChildren)) {
-            component.stopListening();
+        else {
+            return null;
+        }
+    };
+    ChildableComponent.prototype.removeAllComponents = function () {
+        if (!this._componentChildren) {
+            return;
+        }
+        for (var name_2 in this._componentChildren) {
+            this._componentChildren[name_2].stopListening();
         }
         this._componentChildren = {};
-    }
-}
+    };
+    return ChildableComponent;
+}(AbstractComponent));
 exports.ChildableComponent = ChildableComponent;
 //# sourceMappingURL=component.js.map

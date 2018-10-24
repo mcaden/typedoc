@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class SourceReferenceWrapper {
-    constructor(sourceReference) {
+var SourceReferenceWrapper = (function () {
+    function SourceReferenceWrapper(sourceReference) {
         this.sourceReference = sourceReference;
     }
-}
+    return SourceReferenceWrapper;
+}());
 exports.SourceReferenceWrapper = SourceReferenceWrapper;
 //# sourceMappingURL=source-reference-wrapper.js.map

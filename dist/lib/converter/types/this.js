@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,19 +19,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const index_1 = require("../../models/types/index");
-const components_1 = require("../components");
-let ThisConverter = class ThisConverter extends components_1.ConverterTypeComponent {
-    supportsNode(context, node, type) {
+var ts = require("typescript");
+var index_1 = require("../../models/types/index");
+var components_1 = require("../components");
+var ThisConverter = (function (_super) {
+    __extends(ThisConverter, _super);
+    function ThisConverter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ThisConverter.prototype.supportsNode = function (context, node, type) {
         return node.kind === ts.SyntaxKind.ThisType;
-    }
-    convertNode(context, node, type) {
+    };
+    ThisConverter.prototype.convertNode = function (context, node, type) {
         return new index_1.IntrinsicType('this');
-    }
-};
-ThisConverter = __decorate([
-    components_1.Component({ name: 'type:this' })
-], ThisConverter);
+    };
+    ThisConverter = __decorate([
+        components_1.Component({ name: 'type:this' })
+    ], ThisConverter);
+    return ThisConverter;
+}(components_1.ConverterTypeComponent));
 exports.ThisConverter = ThisConverter;
 //# sourceMappingURL=this.js.map

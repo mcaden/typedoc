@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class CommentTag {
-    constructor(tagName, paramName, text) {
+var CommentTag = (function () {
+    function CommentTag(tagName, paramName, text) {
         this.tagName = tagName;
         this.paramName = paramName || '';
         this.text = text || '';
     }
-    toObject() {
-        const result = {
+    CommentTag.prototype.toObject = function () {
+        var result = {
             tag: this.tagName,
             text: this.text
         };
@@ -15,7 +15,8 @@ class CommentTag {
             result.param = this.paramName;
         }
         return result;
-    }
-}
+    };
+    return CommentTag;
+}());
 exports.CommentTag = CommentTag;
 //# sourceMappingURL=tag.js.map

@@ -1,31 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class ReflectionCategory {
-    constructor(title) {
+var ReflectionCategory = (function () {
+    function ReflectionCategory(title) {
+        var _this = this;
         this.children = [];
         this.title = title;
-        this.allChildrenHaveOwnDocument = (() => this.getAllChildrenHaveOwnDocument());
+        this.allChildrenHaveOwnDocument = (function () { return _this.getAllChildrenHaveOwnDocument(); });
     }
-    getAllChildrenHaveOwnDocument() {
-        let onlyOwnDocuments = true;
-        this.children.forEach((child) => {
-            onlyOwnDocuments = onlyOwnDocuments && !!child.hasOwnDocument;
+    ReflectionCategory.prototype.getAllChildrenHaveOwnDocument = function () {
+        var onlyOwnDocuments = true;
+        this.children.forEach(function (child) {
+            onlyOwnDocuments = onlyOwnDocuments && child.hasOwnDocument;
         });
         return onlyOwnDocuments;
-    }
-    toObject() {
-        const result = {
+    };
+    ReflectionCategory.prototype.toObject = function () {
+        var result = {
             title: this.title
         };
         if (this.children) {
-            const children = [];
-            this.children.forEach((child) => {
-                children.push(child.id);
+            var children_1 = [];
+            this.children.forEach(function (child) {
+                children_1.push(child.id);
             });
-            result['children'] = children;
+            result['children'] = children_1;
         }
         return result;
-    }
-}
+    };
+    return ReflectionCategory;
+}());
 exports.ReflectionCategory = ReflectionCategory;
 //# sourceMappingURL=ReflectionCategory.js.map

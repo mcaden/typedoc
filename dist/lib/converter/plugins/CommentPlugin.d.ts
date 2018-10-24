@@ -3,7 +3,7 @@ import { Reflection, ProjectReflection } from '../../models/reflections/index';
 import { ConverterComponent } from '../components';
 export declare class CommentPlugin extends ConverterComponent {
     private comments;
-    private hidden?;
+    private hidden;
     initialize(): void;
     private storeModuleComment;
     private applyModifiers;
@@ -13,6 +13,6 @@ export declare class CommentPlugin extends ConverterComponent {
     private onFunctionImplementation;
     private onBeginResolve;
     private onResolve;
-    static removeTags(comment: Comment | undefined, tagName: string): void;
+    static removeTags(comment: Comment, tagName: string): void;
     static removeReflection(project: ProjectReflection, reflection: Reflection): void;
 }

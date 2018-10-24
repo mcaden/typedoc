@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,19 +19,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const component_1 = require("../../component");
-const options_1 = require("../options");
-let ComponentSource = class ComponentSource extends options_1.OptionsComponent {
-    initialize() {
+var component_1 = require("../../component");
+var options_1 = require("../options");
+var ComponentSource = (function (_super) {
+    __extends(ComponentSource, _super);
+    function ComponentSource() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ComponentSource.prototype.initialize = function () {
+        var _a;
         this.knownComponents = [];
         this.addComponent(this.application);
-        this.listenTo(this.application, {
-            [component_1.ComponentEvent.ADDED]: this.onComponentAdded,
-            [component_1.ComponentEvent.REMOVED]: this.onComponentRemoved
-        });
-    }
-    addComponent(component) {
-        const name = component.componentName;
+        this.listenTo(this.application, (_a = {},
+            _a[component_1.ComponentEvent.ADDED] = this.onComponentAdded,
+            _a[component_1.ComponentEvent.REMOVED] = this.onComponentRemoved,
+            _a));
+    };
+    ComponentSource.prototype.addComponent = function (component) {
+        var name = component.componentName;
         if (!name) {
             this.application.logger.error('Component without name found.');
             return;
@@ -28,34 +46,38 @@ let ComponentSource = class ComponentSource extends options_1.OptionsComponent {
             this.owner.addDeclarations(component.getOptionDeclarations());
         }
         if (component instanceof component_1.ChildableComponent) {
-            for (let child of component.getComponents()) {
+            for (var _i = 0, _a = component.getComponents(); _i < _a.length; _i++) {
+                var child = _a[_i];
                 this.addComponent(child);
             }
         }
-    }
-    removeComponent(component) {
-        let index = this.knownComponents.indexOf(component.componentName);
+    };
+    ComponentSource.prototype.removeComponent = function (component) {
+        var index = this.knownComponents.indexOf(component.componentName);
         if (index !== -1) {
             this.knownComponents.splice(index, 1);
-            for (let declaration of component.getOptionDeclarations()) {
+            for (var _i = 0, _a = component.getOptionDeclarations(); _i < _a.length; _i++) {
+                var declaration = _a[_i];
                 this.owner.removeDeclarationByName(declaration.name);
             }
         }
         if (component instanceof component_1.ChildableComponent) {
-            for (let child of component.getComponents()) {
+            for (var _b = 0, _c = component.getComponents(); _b < _c.length; _b++) {
+                var child = _c[_b];
                 this.removeComponent(child);
             }
         }
-    }
-    onComponentAdded(e) {
+    };
+    ComponentSource.prototype.onComponentAdded = function (e) {
         this.addComponent(e.component);
-    }
-    onComponentRemoved(e) {
+    };
+    ComponentSource.prototype.onComponentRemoved = function (e) {
         this.removeComponent(e.component);
-    }
-};
-ComponentSource = __decorate([
-    component_1.Component({ name: 'options:component' })
-], ComponentSource);
+    };
+    ComponentSource = __decorate([
+        component_1.Component({ name: 'options:component' })
+    ], ComponentSource);
+    return ComponentSource;
+}(options_1.OptionsComponent));
 exports.ComponentSource = ComponentSource;
 //# sourceMappingURL=component.js.map

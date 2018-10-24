@@ -14,9 +14,8 @@ export interface OptionsReadResult {
     inputFiles: string[];
 }
 export declare class DiscoverEvent extends Event {
-    readonly mode: OptionsReadMode;
     data: any;
-    constructor(name: string, mode: OptionsReadMode);
+    mode: OptionsReadMode;
     inputFiles: string[];
     errors: string[];
     static DISCOVER: string;
@@ -31,11 +30,11 @@ export declare class Options extends ChildableComponent<Application, OptionsComp
     read(data?: any, mode?: OptionsReadMode): OptionsReadResult;
     getValue(name: string): any;
     getRawValues(): any;
-    getDeclaration(name: string): OptionDeclaration | undefined;
+    getDeclaration(name: string): OptionDeclaration;
     getDeclarationsByScope(scope: ParameterScope): OptionDeclaration[];
     getCompilerOptions(): ts.CompilerOptions;
-    setValue(name: string | OptionDeclaration, value: any, errorCallback?: (format: string, ...args: string[]) => void): void;
-    setValues(obj: Object, prefix?: string, errorCallback?: (format: string, ...args: string[]) => void): void;
+    setValue(name: string | OptionDeclaration, value: any, errorCallback?: Function): void;
+    setValues(obj: Object, prefix?: string, errorCallback?: Function): void;
     addDeclaration(declaration: OptionDeclaration | DeclarationOption): void;
     addDeclarations(declarations: (OptionDeclaration | DeclarationOption)[]): void;
     removeDeclaration(declaration: OptionDeclaration): void;

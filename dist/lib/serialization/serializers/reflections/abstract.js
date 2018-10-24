@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,15 +19,21 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const component_1 = require("../../../utils/component");
-const models_1 = require("../../../models");
-const components_1 = require("../../components");
-const models_2 = require("../models");
-let ReflectionSerializer = class ReflectionSerializer extends components_1.ReflectionSerializerComponent {
-    supports(t) {
-        return t instanceof models_1.Reflection;
+var component_1 = require("../../../utils/component");
+var models_1 = require("../../../models");
+var components_1 = require("../../components");
+var models_2 = require("../models");
+var ReflectionSerializer = (function (_super) {
+    __extends(ReflectionSerializer, _super);
+    function ReflectionSerializer() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    toObject(reflection, obj) {
+    ReflectionSerializer.prototype.initialize = function () {
+        _super.prototype.initialize.call(this);
+        this.supports = function (r) { return true; };
+    };
+    ReflectionSerializer.prototype.toObject = function (reflection, obj) {
+        var _this = this;
         obj = obj || {};
         Object.assign(obj, {
             id: reflection.id,
@@ -29,7 +48,7 @@ let ReflectionSerializer = class ReflectionSerializer extends components_1.Refle
         if (reflection.comment) {
             obj.comment = this.owner.toObject(reflection.comment);
         }
-        for (let key in reflection.flags) {
+        for (var key in reflection.flags) {
             if (parseInt(key, 10) == key || key === 'flags') {
                 continue;
             }
@@ -38,28 +57,29 @@ let ReflectionSerializer = class ReflectionSerializer extends components_1.Refle
             }
         }
         if (reflection.decorates && reflection.decorates.length > 0) {
-            obj.decorates = reflection.decorates.map(t => this.owner.toObject(t));
+            obj.decorates = reflection.decorates.map(function (t) { return _this.owner.toObject(t); });
         }
         if (reflection.decorators && reflection.decorators.length > 0) {
-            obj.decorators = reflection.decorators.map(d => this.owner.toObject(new models_2.DecoratorWrapper(d)));
+            obj.decorators = reflection.decorators.map(function (d) { return _this.owner.toObject(new models_2.DecoratorWrapper(d)); });
         }
-        reflection.traverse((child, property) => {
+        reflection.traverse(function (child, property) {
             if (property === models_1.TraverseProperty.TypeLiteral) {
                 return;
             }
-            let name = models_1.TraverseProperty[property];
+            var name = models_1.TraverseProperty[property];
             name = name.substr(0, 1).toLowerCase() + name.substr(1);
             if (!obj[name]) {
                 obj[name] = [];
             }
-            obj[name].push(this.owner.toObject(child));
+            obj[name].push(_this.owner.toObject(child));
         });
         return obj;
-    }
-};
-ReflectionSerializer.PRIORITY = 1000;
-ReflectionSerializer = __decorate([
-    component_1.Component({ name: 'serializer:reflection' })
-], ReflectionSerializer);
+    };
+    ReflectionSerializer.PRIORITY = 1000;
+    ReflectionSerializer = __decorate([
+        component_1.Component({ name: 'serializer:reflection' })
+    ], ReflectionSerializer);
+    return ReflectionSerializer;
+}(components_1.ReflectionSerializerComponent));
 exports.ReflectionSerializer = ReflectionSerializer;
 //# sourceMappingURL=abstract.js.map

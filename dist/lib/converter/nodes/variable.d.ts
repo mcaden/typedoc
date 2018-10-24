@@ -5,5 +5,5 @@ import { ConverterNodeComponent } from '../components';
 export declare class VariableConverter extends ConverterNodeComponent<ts.VariableDeclaration> {
     supports: ts.SyntaxKind[];
     isSimpleObjectLiteral(objectLiteral: ts.ObjectLiteralExpression): boolean;
-    convert(context: Context, node: ts.VariableDeclaration): Reflection | undefined;
+    convert(context: Context, node: ts.VariableDeclaration): Reflection;
 }

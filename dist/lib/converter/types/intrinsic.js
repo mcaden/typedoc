@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,24 +19,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const index_1 = require("../../models/index");
-const components_1 = require("../components");
-const IntrinsicTypeFlags = ts.TypeFlags.Intrinsic;
+var ts = require("typescript");
+var index_1 = require("../../models/index");
+var components_1 = require("../components");
+var IntrinsicTypeFlags = ts.TypeFlags.Intrinsic;
 if (IntrinsicTypeFlags === undefined) {
     throw new Error('Internal TypeScript API missing: TypeFlags.Intrinsic');
 }
-let IntrinsicConverter = class IntrinsicConverter extends components_1.ConverterTypeComponent {
-    supportsType(context, type) {
+var IntrinsicConverter = (function (_super) {
+    __extends(IntrinsicConverter, _super);
+    function IntrinsicConverter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    IntrinsicConverter.prototype.supportsType = function (context, type) {
         return !!(type.flags & IntrinsicTypeFlags);
-    }
-    convertType(context, type) {
-        let intrinsicName = context.program.getTypeChecker().typeToString(type);
+    };
+    IntrinsicConverter.prototype.convertType = function (context, type) {
+        var intrinsicName = context.program.getTypeChecker().typeToString(type);
         return new index_1.IntrinsicType(intrinsicName);
-    }
-};
-IntrinsicConverter = __decorate([
-    components_1.Component({ name: 'type:intrinsic' })
-], IntrinsicConverter);
+    };
+    IntrinsicConverter = __decorate([
+        components_1.Component({ name: 'type:intrinsic' })
+    ], IntrinsicConverter);
+    return IntrinsicConverter;
+}(components_1.ConverterTypeComponent));
 exports.IntrinsicConverter = IntrinsicConverter;
 //# sourceMappingURL=intrinsic.js.map

@@ -8,8 +8,8 @@ export { Component };
 export declare abstract class ConverterComponent extends AbstractComponent<Converter> {
 }
 export declare abstract class ConverterNodeComponent<T extends ts.Node> extends ConverterComponent {
-    abstract supports: ts.SyntaxKind[];
-    abstract convert(context: Context, node: T): Reflection | undefined;
+    supports: ts.SyntaxKind[];
+    abstract convert(context: Context, node: T): Reflection;
 }
 export declare abstract class ConverterTypeComponent extends ConverterComponent {
     priority: number;
@@ -18,9 +18,9 @@ export interface TypeConverter<T extends ts.Type, N extends ts.Node> extends Con
 }
 export interface TypeTypeConverter<T extends ts.Type> extends ConverterTypeComponent {
     supportsType(context: Context, type: T): boolean;
-    convertType(context: Context, type: T): Type | undefined;
+    convertType(context: Context, type: T): Type;
 }
 export interface TypeNodeConverter<T extends ts.Type, N extends ts.Node> extends ConverterTypeComponent {
-    supportsNode(context: Context, node: N, type: T | undefined): boolean;
-    convertNode(context: Context, node: N, type: T | undefined): Type | undefined;
+    supportsNode(context: Context, node: N, type: T): boolean;
+    convertNode(context: Context, node: N, type: T): Type;
 }

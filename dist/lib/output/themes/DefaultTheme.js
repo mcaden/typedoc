@@ -1,18 +1,33 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const Path = require("path");
-const FS = require("fs");
-const theme_1 = require("../theme");
-const index_1 = require("../../models/reflections/index");
-const UrlMapping_1 = require("../models/UrlMapping");
-const NavigationItem_1 = require("../models/NavigationItem");
-const events_1 = require("../events");
-class DefaultTheme extends theme_1.Theme {
-    constructor(renderer, basePath) {
-        super(renderer, basePath);
-        this.listenTo(renderer, events_1.RendererEvent.BEGIN, this.onRendererBegin, 1024);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     }
-    isOutputDirectory(path) {
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var Path = require("path");
+var FS = require("fs");
+var theme_1 = require("../theme");
+var index_1 = require("../../models/reflections/index");
+var UrlMapping_1 = require("../models/UrlMapping");
+var NavigationItem_1 = require("../models/NavigationItem");
+var events_1 = require("../events");
+var DefaultTheme = (function (_super) {
+    __extends(DefaultTheme, _super);
+    function DefaultTheme(renderer, basePath) {
+        var _this = _super.call(this, renderer, basePath) || this;
+        _this.listenTo(renderer, events_1.RendererEvent.BEGIN, _this.onRendererBegin, 1024);
+        return _this;
+    }
+    DefaultTheme.prototype.isOutputDirectory = function (path) {
         if (!FS.existsSync(Path.join(path, 'index.html'))) {
             return false;
         }
@@ -26,10 +41,10 @@ class DefaultTheme extends theme_1.Theme {
             return false;
         }
         return true;
-    }
-    getUrls(project) {
-        const urls = [];
-        const entryPoint = this.getEntryPoint(project);
+    };
+    DefaultTheme.prototype.getUrls = function (project) {
+        var urls = [];
+        var entryPoint = this.getEntryPoint(project);
         if (this.application.options.getValue('readme') === 'none') {
             entryPoint.url = 'index.html';
             urls.push(new UrlMapping_1.UrlMapping('index.html', entryPoint, 'reflection.hbs'));
@@ -40,18 +55,18 @@ class DefaultTheme extends theme_1.Theme {
             urls.push(new UrlMapping_1.UrlMapping('index.html', project, 'index.hbs'));
         }
         if (entryPoint.children) {
-            entryPoint.children.forEach((child) => {
+            entryPoint.children.forEach(function (child) {
                 if (child instanceof index_1.DeclarationReflection) {
                     DefaultTheme.buildUrls(child, urls);
                 }
             });
         }
         return urls;
-    }
-    getEntryPoint(project) {
-        const entryPoint = this.owner.entryPoint;
+    };
+    DefaultTheme.prototype.getEntryPoint = function (project) {
+        var entryPoint = this.owner.entryPoint;
         if (entryPoint) {
-            const reflection = project.getChildByName(entryPoint);
+            var reflection = project.getChildByName(entryPoint);
             if (reflection) {
                 if (reflection instanceof index_1.ContainerReflection) {
                     return reflection;
@@ -65,10 +80,10 @@ class DefaultTheme extends theme_1.Theme {
             }
         }
         return project;
-    }
-    getNavigation(project) {
+    };
+    DefaultTheme.prototype.getNavigation = function (project) {
         function containsExternals(modules) {
-            for (let index = 0, length = modules.length; index < length; index++) {
+            for (var index = 0, length_1 = modules.length; index < length_1; index++) {
                 if (modules[index].flags.isExternal) {
                     return true;
                 }
@@ -76,7 +91,7 @@ class DefaultTheme extends theme_1.Theme {
             return false;
         }
         function sortReflections(modules) {
-            modules.sort((a, b) => {
+            modules.sort(function (a, b) {
                 if (a.flags.isExternal && !b.flags.isExternal) {
                     return 1;
                 }
@@ -88,7 +103,8 @@ class DefaultTheme extends theme_1.Theme {
         }
         function includeDedicatedUrls(reflection, item) {
             (function walk(reflection) {
-                for (const child of reflection.children || []) {
+                for (var key in reflection.children) {
+                    var child = reflection.children[key];
                     if (child.hasOwnDocument && !child.kindOf(index_1.ReflectionKind.SomeModule)) {
                         if (!item.dedicatedUrls) {
                             item.dedicatedUrls = [];
@@ -100,30 +116,30 @@ class DefaultTheme extends theme_1.Theme {
             })(reflection);
         }
         function buildChildren(reflection, parent) {
-            const modules = reflection.getChildrenByKind(index_1.ReflectionKind.SomeModule);
-            modules.sort((a, b) => {
+            var modules = reflection.getChildrenByKind(index_1.ReflectionKind.SomeModule);
+            modules.sort(function (a, b) {
                 return a.getFullName() < b.getFullName() ? -1 : 1;
             });
-            modules.forEach((reflection) => {
-                const item = NavigationItem_1.NavigationItem.create(reflection, parent);
+            modules.forEach(function (reflection) {
+                var item = NavigationItem_1.NavigationItem.create(reflection, parent);
                 includeDedicatedUrls(reflection, item);
                 buildChildren(reflection, item);
             });
         }
         function buildGroups(reflections, parent, callback) {
-            let state = -1;
-            const hasExternals = containsExternals(reflections);
+            var state = -1;
+            var hasExternals = containsExternals(reflections);
             sortReflections(reflections);
-            reflections.forEach((reflection) => {
+            reflections.forEach(function (reflection) {
                 if (hasExternals && !reflection.flags.isExternal && state !== 1) {
-                    new NavigationItem_1.NavigationItem('Internals', undefined, parent, 'tsd-is-external');
+                    new NavigationItem_1.NavigationItem('Internals', null, parent, 'tsd-is-external');
                     state = 1;
                 }
                 else if (hasExternals && reflection.flags.isExternal && state !== 2) {
-                    new NavigationItem_1.NavigationItem('Externals', undefined, parent, 'tsd-is-external');
+                    new NavigationItem_1.NavigationItem('Externals', null, parent, 'tsd-is-external');
                     state = 2;
                 }
-                const item = NavigationItem_1.NavigationItem.create(reflection, parent);
+                var item = NavigationItem_1.NavigationItem.create(reflection, parent);
                 includeDedicatedUrls(reflection, item);
                 if (callback) {
                     callback(reflection, item);
@@ -131,15 +147,15 @@ class DefaultTheme extends theme_1.Theme {
             });
         }
         function build(hasSeparateGlobals) {
-            const root = new NavigationItem_1.NavigationItem('Index', 'index.html');
+            var root = new NavigationItem_1.NavigationItem('Index', 'index.html');
             if (entryPoint === project) {
-                const globals = new NavigationItem_1.NavigationItem('Globals', hasSeparateGlobals ? 'globals.html' : 'index.html', root);
+                var globals = new NavigationItem_1.NavigationItem('Globals', hasSeparateGlobals ? 'globals.html' : 'index.html', root);
                 globals.isGlobals = true;
             }
-            const modules = [];
-            project.getReflectionsByKind(index_1.ReflectionKind.SomeModule).forEach((someModule) => {
-                let target = someModule.parent;
-                let inScope = (someModule === entryPoint);
+            var modules = [];
+            project.getReflectionsByKind(index_1.ReflectionKind.SomeModule).forEach(function (someModule) {
+                var target = someModule.parent;
+                var inScope = (someModule === entryPoint);
                 while (target) {
                     if (target.kindOf(index_1.ReflectionKind.ExternalModule)) {
                         return;
@@ -161,44 +177,52 @@ class DefaultTheme extends theme_1.Theme {
             }
             return root;
         }
-        const entryPoint = this.getEntryPoint(project);
+        var entryPoint = this.getEntryPoint(project);
         return build(this.application.options.getValue('readme') !== 'none');
-    }
-    onRendererBegin(event) {
+    };
+    DefaultTheme.prototype.onRendererBegin = function (event) {
         if (event.project.groups) {
             event.project.groups.forEach(DefaultTheme.applyGroupClasses);
         }
-        for (let id in event.project.reflections) {
-            const reflection = event.project.reflections[id];
+        for (var id in event.project.reflections) {
+            var reflection = event.project.reflections[id];
             if (reflection instanceof index_1.DeclarationReflection) {
                 DefaultTheme.applyReflectionClasses(reflection);
             }
-            if (reflection instanceof index_1.ContainerReflection && reflection.groups) {
-                reflection.groups.forEach(DefaultTheme.applyGroupClasses);
+            if (reflection instanceof index_1.ContainerReflection && reflection['groups']) {
+                reflection['groups'].forEach(DefaultTheme.applyGroupClasses);
             }
         }
-    }
-    static getUrl(reflection, relative, separator = '.') {
-        let url = reflection.getAlias();
+    };
+    DefaultTheme.getUrl = function (reflection, relative, separator) {
+        if (separator === void 0) { separator = '.'; }
+        var url = reflection.getAlias();
         if (reflection.parent && reflection.parent !== relative &&
             !(reflection.parent instanceof index_1.ProjectReflection)) {
             url = DefaultTheme.getUrl(reflection.parent, relative, separator) + separator + url;
         }
         return url;
-    }
-    static getMapping(reflection) {
-        return DefaultTheme.MAPPINGS.find(mapping => reflection.kindOf(mapping.kind));
-    }
-    static buildUrls(reflection, urls) {
-        const mapping = DefaultTheme.getMapping(reflection);
+    };
+    DefaultTheme.getMapping = function (reflection) {
+        for (var i = 0, c = DefaultTheme.MAPPINGS.length; i < c; i++) {
+            var mapping = DefaultTheme.MAPPINGS[i];
+            if (reflection.kindOf(mapping.kind)) {
+                return mapping;
+            }
+        }
+        return null;
+    };
+    DefaultTheme.buildUrls = function (reflection, urls) {
+        var mapping = DefaultTheme.getMapping(reflection);
         if (mapping) {
             if (!reflection.url || !DefaultTheme.URL_PREFIX.test(reflection.url)) {
-                const url = [mapping.directory, DefaultTheme.getUrl(reflection) + '.html'].join('/');
+                var url = [mapping.directory, DefaultTheme.getUrl(reflection) + '.html'].join('/');
                 urls.push(new UrlMapping_1.UrlMapping(url, reflection, mapping.template));
                 reflection.url = url;
                 reflection.hasOwnDocument = true;
             }
-            for (const child of reflection.children || []) {
+            for (var key in reflection.children) {
+                var child = reflection.children[key];
                 if (mapping.isLeaf) {
                     DefaultTheme.applyAnchorUrl(child, reflection);
                 }
@@ -207,14 +231,14 @@ class DefaultTheme extends theme_1.Theme {
                 }
             }
         }
-        else if (reflection.parent) {
+        else {
             DefaultTheme.applyAnchorUrl(reflection, reflection.parent);
         }
         return urls;
-    }
-    static applyAnchorUrl(reflection, container) {
+    };
+    DefaultTheme.applyAnchorUrl = function (reflection, container) {
         if (!reflection.url || !DefaultTheme.URL_PREFIX.test(reflection.url)) {
-            let anchor = DefaultTheme.getUrl(reflection, container, '.');
+            var anchor = DefaultTheme.getUrl(reflection, container, '.');
             if (reflection['isStatic']) {
                 anchor = 'static-' + anchor;
             }
@@ -222,15 +246,15 @@ class DefaultTheme extends theme_1.Theme {
             reflection.anchor = anchor;
             reflection.hasOwnDocument = false;
         }
-        reflection.traverse((child) => {
+        reflection.traverse(function (child) {
             if (child instanceof index_1.DeclarationReflection) {
                 DefaultTheme.applyAnchorUrl(child, container);
             }
         });
-    }
-    static applyReflectionClasses(reflection) {
-        const classes = [];
-        let kind;
+    };
+    DefaultTheme.applyReflectionClasses = function (reflection) {
+        var classes = [];
+        var kind;
         if (reflection.kind === index_1.ReflectionKind.Accessor) {
             if (!reflection.getSignature) {
                 classes.push('tsd-kind-set-signature');
@@ -248,10 +272,10 @@ class DefaultTheme extends theme_1.Theme {
         }
         if (reflection.parent && reflection.parent instanceof index_1.DeclarationReflection) {
             kind = index_1.ReflectionKind[reflection.parent.kind];
-            classes.push(DefaultTheme.toStyleClass(`tsd-parent-kind-${kind}`));
+            classes.push(DefaultTheme.toStyleClass("tsd-parent-kind-" + kind));
         }
-        let hasTypeParameters = !!reflection.typeParameters;
-        reflection.getAllSignatures().forEach((signature) => {
+        var hasTypeParameters = !!reflection.typeParameters;
+        reflection.getAllSignatures().forEach(function (signature) {
             hasTypeParameters = hasTypeParameters || !!signature.typeParameters;
         });
         if (hasTypeParameters) {
@@ -279,9 +303,9 @@ class DefaultTheme extends theme_1.Theme {
             classes.push('tsd-is-not-exported');
         }
         reflection.cssClasses = classes.join(' ');
-    }
-    static applyGroupClasses(group) {
-        const classes = [];
+    };
+    DefaultTheme.applyGroupClasses = function (group) {
+        var classes = [];
         if (group.allChildrenAreInherited) {
             classes.push('tsd-is-inherited');
         }
@@ -298,32 +322,33 @@ class DefaultTheme extends theme_1.Theme {
             classes.push('tsd-is-not-exported');
         }
         group.cssClasses = classes.join(' ');
-    }
-    static toStyleClass(str) {
-        return str.replace(/(\w)([A-Z])/g, (m, m1, m2) => m1 + '-' + m2).toLowerCase();
-    }
-}
-DefaultTheme.MAPPINGS = [{
-        kind: [index_1.ReflectionKind.Class],
-        isLeaf: false,
-        directory: 'classes',
-        template: 'reflection.hbs'
-    }, {
-        kind: [index_1.ReflectionKind.Interface],
-        isLeaf: false,
-        directory: 'interfaces',
-        template: 'reflection.hbs'
-    }, {
-        kind: [index_1.ReflectionKind.Enum],
-        isLeaf: false,
-        directory: 'enums',
-        template: 'reflection.hbs'
-    }, {
-        kind: [index_1.ReflectionKind.Module, index_1.ReflectionKind.ExternalModule],
-        isLeaf: false,
-        directory: 'modules',
-        template: 'reflection.hbs'
-    }];
-DefaultTheme.URL_PREFIX = /^(http|ftp)s?:\/\//;
+    };
+    DefaultTheme.toStyleClass = function (str) {
+        return str.replace(/(\w)([A-Z])/g, function (m, m1, m2) { return m1 + '-' + m2; }).toLowerCase();
+    };
+    DefaultTheme.MAPPINGS = [{
+            kind: [index_1.ReflectionKind.Class],
+            isLeaf: false,
+            directory: 'classes',
+            template: 'reflection.hbs'
+        }, {
+            kind: [index_1.ReflectionKind.Interface],
+            isLeaf: false,
+            directory: 'interfaces',
+            template: 'reflection.hbs'
+        }, {
+            kind: [index_1.ReflectionKind.Enum],
+            isLeaf: false,
+            directory: 'enums',
+            template: 'reflection.hbs'
+        }, {
+            kind: [index_1.ReflectionKind.Module, index_1.ReflectionKind.ExternalModule],
+            isLeaf: false,
+            directory: 'modules',
+            template: 'reflection.hbs'
+        }];
+    DefaultTheme.URL_PREFIX = /^(http|ftp)s?:\/\//;
+    return DefaultTheme;
+}(theme_1.Theme));
 exports.DefaultTheme = DefaultTheme;
 //# sourceMappingURL=DefaultTheme.js.map

@@ -1,27 +1,43 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_1 = require("./abstract");
-class IntrinsicType extends abstract_1.Type {
-    constructor(name) {
-        super();
-        this.type = 'intrinsic';
-        this.name = name;
+var abstract_1 = require("./abstract");
+var IntrinsicType = (function (_super) {
+    __extends(IntrinsicType, _super);
+    function IntrinsicType(name) {
+        var _this = _super.call(this) || this;
+        _this.type = 'intrinsic';
+        _this.name = name;
+        return _this;
     }
-    clone() {
+    IntrinsicType.prototype.clone = function () {
         return new IntrinsicType(this.name);
-    }
-    equals(type) {
+    };
+    IntrinsicType.prototype.equals = function (type) {
         return type instanceof IntrinsicType &&
             type.name === this.name;
-    }
-    toObject() {
-        const result = super.toObject();
+    };
+    IntrinsicType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         result.name = this.name;
         return result;
-    }
-    toString() {
+    };
+    IntrinsicType.prototype.toString = function () {
         return this.name;
-    }
-}
+    };
+    return IntrinsicType;
+}(abstract_1.Type));
 exports.IntrinsicType = IntrinsicType;
 //# sourceMappingURL=intrinsic.js.map

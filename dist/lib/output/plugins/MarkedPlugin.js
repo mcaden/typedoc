@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,32 +19,35 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const FS = require("fs-extra");
-const Path = require("path");
-const Marked = require("marked");
-const HighlightJS = require("highlight.js");
-const Handlebars = require("handlebars");
-const components_1 = require("../components");
-const events_1 = require("../events");
-const component_1 = require("../../utils/component");
-const declaration_1 = require("../../utils/options/declaration");
-let MarkedPlugin = class MarkedPlugin extends components_1.ContextAwareRendererComponent {
-    constructor() {
-        super(...arguments);
-        this.includePattern = /\[\[include:([^\]]+?)\]\]/g;
-        this.mediaPattern = /media:\/\/([^ "\)\]\}]+)/g;
+var FS = require("fs-extra");
+var Path = require("path");
+var Marked = require("marked");
+var HighlightJS = require("highlight.js");
+var Handlebars = require("handlebars");
+var components_1 = require("../components");
+var events_1 = require("../events");
+var component_1 = require("../../utils/component");
+var declaration_1 = require("../../utils/options/declaration");
+var MarkedPlugin = (function (_super) {
+    __extends(MarkedPlugin, _super);
+    function MarkedPlugin() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.includePattern = /\[\[include:([^\]]+?)\]\]/g;
+        _this.mediaPattern = /media:\/\/([^ "\)\]\}]+)/g;
+        return _this;
     }
-    initialize() {
-        super.initialize();
+    MarkedPlugin.prototype.initialize = function () {
+        var _this = this;
+        _super.prototype.initialize.call(this);
         this.listenTo(this.owner, events_1.MarkdownEvent.PARSE, this.onParseMarkdown);
-        const that = this;
+        var that = this;
         Handlebars.registerHelper('markdown', function (arg) { return that.parseMarkdown(arg.fn(this), this); });
-        Handlebars.registerHelper('relativeURL', (url) => url ? this.getRelativeUrl(url) : url);
+        Handlebars.registerHelper('relativeURL', function (url) { return url ? _this.getRelativeUrl(url) : url; });
         Marked.setOptions({
-            highlight: (text, lang) => this.getHighlighted(text, lang)
+            highlight: function (text, lang) { return _this.getHighlighted(text, lang); }
         });
-    }
-    getHighlighted(text, lang) {
+    };
+    MarkedPlugin.prototype.getHighlighted = function (text, lang) {
         try {
             if (lang) {
                 return HighlightJS.highlight(lang, text).value;
@@ -44,15 +60,16 @@ let MarkedPlugin = class MarkedPlugin extends components_1.ContextAwareRendererC
             this.application.logger.warn(error.message);
             return text;
         }
-    }
-    parseMarkdown(text, context) {
+    };
+    MarkedPlugin.prototype.parseMarkdown = function (text, context) {
+        var _this = this;
         if (this.includes) {
-            text = text.replace(this.includePattern, (match, path) => {
-                path = Path.join(this.includes, path.trim());
+            text = text.replace(this.includePattern, function (match, path) {
+                path = Path.join(_this.includes, path.trim());
                 if (FS.existsSync(path) && FS.statSync(path).isFile()) {
-                    const contents = FS.readFileSync(path, 'utf-8');
+                    var contents = FS.readFileSync(path, 'utf-8');
                     if (path.substr(-4).toLocaleLowerCase() === '.hbs') {
-                        const template = Handlebars.compile(contents);
+                        var template = Handlebars.compile(contents);
                         return template(context);
                     }
                     else {
@@ -65,24 +82,26 @@ let MarkedPlugin = class MarkedPlugin extends components_1.ContextAwareRendererC
             });
         }
         if (this.mediaDirectory) {
-            text = text.replace(this.mediaPattern, (match, path) => {
-                if (FS.existsSync(Path.join(this.mediaDirectory, path))) {
-                    return this.getRelativeUrl('media') + '/' + path;
+            text = text.replace(this.mediaPattern, function (match, path) {
+                if (FS.existsSync(Path.join(_this.mediaDirectory, path))) {
+                    return _this.getRelativeUrl('media') + '/' + path;
                 }
                 else {
                     return match;
                 }
             });
         }
-        const event = new events_1.MarkdownEvent(events_1.MarkdownEvent.PARSE, text, text);
+        var event = new events_1.MarkdownEvent(events_1.MarkdownEvent.PARSE);
+        event.originalText = text;
+        event.parsedText = text;
         this.owner.trigger(event);
         return event.parsedText;
-    }
-    onBeginRenderer(event) {
-        super.onBeginRenderer(event);
+    };
+    MarkedPlugin.prototype.onBeginRenderer = function (event) {
+        _super.prototype.onBeginRenderer.call(this, event);
         delete this.includes;
         if (this.includeSource) {
-            const includes = Path.resolve(this.includeSource);
+            var includes = Path.resolve(this.includeSource);
             if (FS.existsSync(includes) && FS.statSync(includes).isDirectory()) {
                 this.includes = includes;
             }
@@ -91,37 +110,38 @@ let MarkedPlugin = class MarkedPlugin extends components_1.ContextAwareRendererC
             }
         }
         if (this.mediaSource) {
-            const media = Path.resolve(this.mediaSource);
+            var media = Path.resolve(this.mediaSource);
             if (FS.existsSync(media) && FS.statSync(media).isDirectory()) {
                 this.mediaDirectory = Path.join(event.outputDirectory, 'media');
                 FS.copySync(media, this.mediaDirectory);
             }
             else {
-                this.mediaDirectory = undefined;
+                this.mediaDirectory = null;
                 this.application.logger.warn('Could not find provided media directory: ' + media);
             }
         }
-    }
-    onParseMarkdown(event) {
+    };
+    MarkedPlugin.prototype.onParseMarkdown = function (event) {
         event.parsedText = Marked(event.parsedText);
-    }
-};
-__decorate([
-    component_1.Option({
-        name: 'includes',
-        help: 'Specifies the location to look for included documents (use [[include:FILENAME]] in comments).',
-        hint: declaration_1.ParameterHint.Directory
-    })
-], MarkedPlugin.prototype, "includeSource", void 0);
-__decorate([
-    component_1.Option({
-        name: 'media',
-        help: 'Specifies the location with media files that should be copied to the output directory.',
-        hint: declaration_1.ParameterHint.Directory
-    })
-], MarkedPlugin.prototype, "mediaSource", void 0);
-MarkedPlugin = __decorate([
-    components_1.Component({ name: 'marked' })
-], MarkedPlugin);
+    };
+    __decorate([
+        component_1.Option({
+            name: 'includes',
+            help: 'Specifies the location to look for included documents (use [[include:FILENAME]] in comments).',
+            hint: declaration_1.ParameterHint.Directory
+        })
+    ], MarkedPlugin.prototype, "includeSource", void 0);
+    __decorate([
+        component_1.Option({
+            name: 'media',
+            help: 'Specifies the location with media files that should be copied to the output directory.',
+            hint: declaration_1.ParameterHint.Directory
+        })
+    ], MarkedPlugin.prototype, "mediaSource", void 0);
+    MarkedPlugin = __decorate([
+        components_1.Component({ name: 'marked' })
+    ], MarkedPlugin);
+    return MarkedPlugin;
+}(components_1.ContextAwareRendererComponent));
 exports.MarkedPlugin = MarkedPlugin;
 //# sourceMappingURL=MarkedPlugin.js.map

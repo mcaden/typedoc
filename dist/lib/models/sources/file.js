@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Path = require("path");
-class SourceFile {
-    constructor(fullFileName) {
+var Path = require("path");
+var SourceFile = (function () {
+    function SourceFile(fullFileName) {
         this.reflections = [];
         this.fileName = fullFileName;
         this.fullFileName = fullFileName;
         this.name = Path.basename(fullFileName);
     }
-}
+    return SourceFile;
+}());
 exports.SourceFile = SourceFile;
 //# sourceMappingURL=file.js.map

@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,17 +19,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const FS = require("fs");
-const Path = require("path");
-const component_1 = require("./component");
-const declaration_1 = require("./options/declaration");
-let PluginHost = class PluginHost extends component_1.AbstractComponent {
-    load() {
-        const logger = this.application.logger;
-        const plugins = this.plugins || this.discoverNpmPlugins();
-        let i, c = plugins.length;
+var FS = require("fs");
+var Path = require("path");
+var Util = require("util");
+var component_1 = require("./component");
+var declaration_1 = require("./options/declaration");
+var PluginHost = (function (_super) {
+    __extends(PluginHost, _super);
+    function PluginHost() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PluginHost.prototype.load = function () {
+        var logger = this.application.logger;
+        var plugins = this.plugins || this.discoverNpmPlugins();
+        var i, c = plugins.length;
         for (i = 0; i < c; i++) {
-            const plugin = plugins[i];
+            var plugin = plugins[i];
             if (typeof plugin !== 'string') {
                 logger.error('Unknown plugin %s', plugin);
                 return false;
@@ -26,10 +44,10 @@ let PluginHost = class PluginHost extends component_1.AbstractComponent {
             }
         }
         for (i = 0; i < c; i++) {
-            const plugin = plugins[i];
+            var plugin = plugins[i];
             try {
-                const instance = require(plugin);
-                const initFunction = typeof instance.load === 'function'
+                var instance = require(plugin);
+                var initFunction = typeof instance.load === 'function'
                     ? instance.load
                     : instance;
                 if (typeof initFunction === 'function') {
@@ -43,20 +61,18 @@ let PluginHost = class PluginHost extends component_1.AbstractComponent {
             catch (error) {
                 logger.error('The plugin %s could not be loaded.', plugin);
                 logger.writeln(error.stack);
-                return false;
             }
         }
-        return true;
-    }
-    discoverNpmPlugins() {
-        const result = [];
-        const logger = this.application.logger;
+    };
+    PluginHost.prototype.discoverNpmPlugins = function () {
+        var result = [];
+        var logger = this.application.logger;
         discover();
         return result;
         function discover() {
-            let path = process.cwd(), previous;
+            var path = process.cwd(), previous;
             do {
-                const modules = Path.join(path, 'node_modules');
+                var modules = Path.join(path, 'node_modules');
                 if (FS.existsSync(modules) && FS.statSync(modules).isDirectory()) {
                     discoverModules(modules);
                 }
@@ -65,22 +81,22 @@ let PluginHost = class PluginHost extends component_1.AbstractComponent {
             } while (previous !== path);
         }
         function discoverModules(basePath) {
-            const candidates = [];
-            FS.readdirSync(basePath).forEach((name) => {
-                const dir = Path.join(basePath, name);
+            var candidates = [];
+            FS.readdirSync(basePath).forEach(function (name) {
+                var dir = Path.join(basePath, name);
                 if (name.startsWith('@')) {
-                    FS.readdirSync(dir).forEach((n) => {
+                    FS.readdirSync(dir).forEach(function (n) {
                         candidates.push(Path.join(name, n));
                     });
                 }
                 candidates.push(name);
             });
-            candidates.forEach((name) => {
-                const infoFile = Path.join(basePath, name, 'package.json');
+            candidates.forEach(function (name) {
+                var infoFile = Path.join(basePath, name, 'package.json');
                 if (!FS.existsSync(infoFile)) {
                     return;
                 }
-                const info = loadPackageInfo(infoFile);
+                var info = loadPackageInfo(infoFile);
                 if (isPlugin(info)) {
                     result.push(Path.join(basePath, name));
                 }
@@ -96,29 +112,30 @@ let PluginHost = class PluginHost extends component_1.AbstractComponent {
             }
         }
         function isPlugin(info) {
-            const keywords = info.keywords;
-            if (!keywords || !Array.isArray(keywords)) {
+            var keywords = info.keywords;
+            if (!keywords || !Util.isArray(keywords)) {
                 return false;
             }
-            for (let i = 0, c = keywords.length; i < c; i++) {
-                const keyword = keywords[i];
+            for (var i = 0, c = keywords.length; i < c; i++) {
+                var keyword = keywords[i];
                 if (typeof keyword === 'string' && keyword.toLowerCase() === 'typedocplugin') {
                     return true;
                 }
             }
             return false;
         }
-    }
-};
-__decorate([
-    component_1.Option({
-        name: 'plugin',
-        help: 'Specify the npm plugins that should be loaded. Omit to load all installed plugins, set to \'none\' to load no plugins.',
-        type: declaration_1.ParameterType.Array
-    })
-], PluginHost.prototype, "plugins", void 0);
-PluginHost = __decorate([
-    component_1.Component({ name: 'plugin-host', internal: true })
-], PluginHost);
+    };
+    __decorate([
+        component_1.Option({
+            name: 'plugin',
+            help: 'Specify the npm plugins that should be loaded. Omit to load all installed plugins, set to \'none\' to load no plugins.',
+            type: declaration_1.ParameterType.Array
+        })
+    ], PluginHost.prototype, "plugins", void 0);
+    PluginHost = __decorate([
+        component_1.Component({ name: 'plugin-host', internal: true })
+    ], PluginHost);
+    return PluginHost;
+}(component_1.AbstractComponent));
 exports.PluginHost = PluginHost;
 //# sourceMappingURL=plugins.js.map

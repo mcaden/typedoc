@@ -1,42 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const _ts = require("../../ts-internal");
-const declaration_1 = require("./declaration");
+var ts = require("typescript");
+var _ts = require("../../ts-internal");
+var declaration_1 = require("./declaration");
 function getParameterHelp(options, scope) {
-    const parameters = options.getDeclarationsByScope(scope);
-    parameters.sort((a, b) => {
+    var parameters = options.getDeclarationsByScope(scope);
+    parameters.sort(function (a, b) {
         return _ts.compareValues(a.name.toLowerCase(), b.name.toLowerCase());
     });
-    const names = [];
-    const helps = [];
-    let margin = 0;
-    for (let i = 0; i < parameters.length; i++) {
-        const parameter = parameters[i];
+    var names = [];
+    var helps = [];
+    var margin = 0;
+    for (var i = 0; i < parameters.length; i++) {
+        var parameter = parameters[i];
         if (!parameter.help) {
             continue;
         }
-        let name = ' ';
+        var name_1 = ' ';
         if (parameter.short) {
-            name += '-' + parameter.short;
+            name_1 += '-' + parameter.short;
             if (typeof parameter.hint !== 'undefined') {
-                name += ' ' + declaration_1.ParameterHint[parameter.hint].toUpperCase();
+                name_1 += ' ' + declaration_1.ParameterHint[parameter.hint].toUpperCase();
             }
-            name += ', ';
+            name_1 += ', ';
         }
-        name += '--' + parameter.name;
+        name_1 += '--' + parameter.name;
         if (parameter.hint) {
-            name += ' ' + declaration_1.ParameterHint[parameter.hint].toUpperCase();
+            name_1 += ' ' + declaration_1.ParameterHint[parameter.hint].toUpperCase();
         }
-        names.push(name);
+        names.push(name_1);
         helps.push(parameter.help);
-        margin = Math.max(name.length, margin);
+        margin = Math.max(name_1.length, margin);
     }
     return { names: names, helps: helps, margin: margin };
 }
 function getOptionsHelp(options) {
-    const typeDoc = getParameterHelp(options, declaration_1.ParameterScope.TypeDoc);
-    const output = [];
+    var typeDoc = getParameterHelp(options, declaration_1.ParameterScope.TypeDoc);
+    var output = [];
     output.push('Usage:');
     output.push(' typedoc --mode modules --out path/to/documentation path/to/sourcefiles');
     output.push('', 'TypeDoc options:');
@@ -46,9 +46,9 @@ function getOptionsHelp(options) {
     output.push('');
     return output.join(ts.sys.newLine);
     function pushHelp(columns) {
-        for (let i = 0; i < columns.names.length; i++) {
-            const usage = columns.names[i];
-            const description = columns.helps[i];
+        for (var i = 0; i < columns.names.length; i++) {
+            var usage = columns.names[i];
+            var description = columns.helps[i];
             output.push(usage + padding(typeDoc.margin - usage.length + 2) + description);
         }
     }

@@ -1,27 +1,43 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_1 = require("./abstract");
-class UnknownType extends abstract_1.Type {
-    constructor(name) {
-        super();
-        this.type = 'unknown';
-        this.name = name;
+var abstract_1 = require("./abstract");
+var UnknownType = (function (_super) {
+    __extends(UnknownType, _super);
+    function UnknownType(name) {
+        var _this = _super.call(this) || this;
+        _this.type = 'unknown';
+        _this.name = name;
+        return _this;
     }
-    clone() {
+    UnknownType.prototype.clone = function () {
         return new UnknownType(this.name);
-    }
-    equals(type) {
+    };
+    UnknownType.prototype.equals = function (type) {
         return type instanceof UnknownType &&
             type.name === this.name;
-    }
-    toObject() {
-        const result = super.toObject();
+    };
+    UnknownType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         result.name = this.name;
         return result;
-    }
-    toString() {
+    };
+    UnknownType.prototype.toString = function () {
         return this.name;
-    }
-}
+    };
+    return UnknownType;
+}(abstract_1.Type));
 exports.UnknownType = UnknownType;
 //# sourceMappingURL=unknown.js.map

@@ -1,6 +1,6 @@
 import { ReferenceType } from '../../../models';
 import { TypeSerializerComponent } from '../../components';
 export declare class ReferenceTypeSerializer extends TypeSerializerComponent<ReferenceType> {
-    supports(t: unknown): boolean;
+    initialize(): void;
     toObject(reference: ReferenceType, obj?: any): any;
 }

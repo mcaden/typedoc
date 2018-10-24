@@ -2,12 +2,12 @@ import { CommentTag } from './tag';
 export declare class Comment {
     shortText: string;
     text: string;
-    returns?: string;
-    tags?: CommentTag[];
+    returns: string;
+    tags: CommentTag[];
     constructor(shortText?: string, text?: string);
     hasVisibleComponent(): boolean;
     hasTag(tagName: string): boolean;
-    getTag(tagName: string, paramName?: string): CommentTag | undefined;
+    getTag(tagName: string, paramName?: string): CommentTag;
     copyFrom(comment: Comment): void;
     toObject(): any;
 }

@@ -1,35 +1,51 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_1 = require("./abstract");
-class IntersectionType extends abstract_1.Type {
-    constructor(types) {
-        super();
-        this.type = 'intersection';
-        this.types = types;
+var abstract_1 = require("./abstract");
+var IntersectionType = (function (_super) {
+    __extends(IntersectionType, _super);
+    function IntersectionType(types) {
+        var _this = _super.call(this) || this;
+        _this.type = 'intersection';
+        _this.types = types;
+        return _this;
     }
-    clone() {
+    IntersectionType.prototype.clone = function () {
         return new IntersectionType(this.types);
-    }
-    equals(type) {
+    };
+    IntersectionType.prototype.equals = function (type) {
         if (!(type instanceof IntersectionType)) {
             return false;
         }
-        return abstract_1.Type.isTypeListSimilar(type.types, this.types);
-    }
-    toObject() {
-        const result = super.toObject();
+        return abstract_1.Type.isTypeListSimiliar(type.types, this.types);
+    };
+    IntersectionType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         if (this.types && this.types.length) {
-            result.types = this.types.map((e) => e.toObject());
+            result.types = this.types.map(function (e) { return e.toObject(); });
         }
         return result;
-    }
-    toString() {
-        const names = [];
-        this.types.forEach((element) => {
+    };
+    IntersectionType.prototype.toString = function () {
+        var names = [];
+        this.types.forEach(function (element) {
             names.push(element.toString());
         });
         return names.join(' & ');
-    }
-}
+    };
+    return IntersectionType;
+}(abstract_1.Type));
 exports.IntersectionType = IntersectionType;
 //# sourceMappingURL=intersection.js.map

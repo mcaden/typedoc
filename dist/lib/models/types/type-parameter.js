@@ -1,18 +1,33 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const abstract_1 = require("./abstract");
-class TypeParameterType extends abstract_1.Type {
-    constructor(name) {
-        super();
-        this.type = 'typeParameter';
-        this.name = name;
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     }
-    clone() {
-        const clone = new TypeParameterType(this.name);
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var abstract_1 = require("./abstract");
+var TypeParameterType = (function (_super) {
+    __extends(TypeParameterType, _super);
+    function TypeParameterType() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.type = 'typeParameter';
+        return _this;
+    }
+    TypeParameterType.prototype.clone = function () {
+        var clone = new TypeParameterType();
+        clone.name = this.name;
         clone.constraint = this.constraint;
         return clone;
-    }
-    equals(type) {
+    };
+    TypeParameterType.prototype.equals = function (type) {
         if (!(type instanceof TypeParameterType)) {
             return false;
         }
@@ -25,18 +40,19 @@ class TypeParameterType extends abstract_1.Type {
         else {
             return false;
         }
-    }
-    toObject() {
-        const result = super.toObject();
+    };
+    TypeParameterType.prototype.toObject = function () {
+        var result = _super.prototype.toObject.call(this);
         result.name = this.name;
         if (this.constraint) {
             result.constraint = this.constraint.toObject();
         }
         return result;
-    }
-    toString() {
+    };
+    TypeParameterType.prototype.toString = function () {
         return this.name;
-    }
-}
+    };
+    return TypeParameterType;
+}(abstract_1.Type));
 exports.TypeParameterType = TypeParameterType;
 //# sourceMappingURL=type-parameter.js.map

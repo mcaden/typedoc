@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,29 +19,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var CommentPlugin_1;
-const index_1 = require("../../models/comments/index");
-const index_2 = require("../../models/types/index");
-const index_3 = require("../../models/reflections/index");
-const components_1 = require("../components");
-const comment_1 = require("../factories/comment");
-const converter_1 = require("../converter");
-let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.ConverterComponent {
-    initialize() {
-        this.listenTo(this.owner, {
-            [converter_1.Converter.EVENT_BEGIN]: this.onBegin,
-            [converter_1.Converter.EVENT_CREATE_DECLARATION]: this.onDeclaration,
-            [converter_1.Converter.EVENT_CREATE_SIGNATURE]: this.onDeclaration,
-            [converter_1.Converter.EVENT_CREATE_TYPE_PARAMETER]: this.onCreateTypeParameter,
-            [converter_1.Converter.EVENT_FUNCTION_IMPLEMENTATION]: this.onFunctionImplementation,
-            [converter_1.Converter.EVENT_RESOLVE_BEGIN]: this.onBeginResolve,
-            [converter_1.Converter.EVENT_RESOLVE]: this.onResolve
-        });
+var index_1 = require("../../models/comments/index");
+var index_2 = require("../../models/types/index");
+var index_3 = require("../../models/reflections/index");
+var components_1 = require("../components");
+var comment_1 = require("../factories/comment");
+var converter_1 = require("../converter");
+var CommentPlugin = (function (_super) {
+    __extends(CommentPlugin, _super);
+    function CommentPlugin() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    storeModuleComment(comment, reflection) {
-        const isPreferred = (comment.toLowerCase().indexOf('@preferred') !== -1);
+    CommentPlugin_1 = CommentPlugin;
+    CommentPlugin.prototype.initialize = function () {
+        var _a;
+        this.listenTo(this.owner, (_a = {},
+            _a[converter_1.Converter.EVENT_BEGIN] = this.onBegin,
+            _a[converter_1.Converter.EVENT_CREATE_DECLARATION] = this.onDeclaration,
+            _a[converter_1.Converter.EVENT_CREATE_SIGNATURE] = this.onDeclaration,
+            _a[converter_1.Converter.EVENT_CREATE_TYPE_PARAMETER] = this.onCreateTypeParameter,
+            _a[converter_1.Converter.EVENT_FUNCTION_IMPLEMENTATION] = this.onFunctionImplementation,
+            _a[converter_1.Converter.EVENT_RESOLVE_BEGIN] = this.onBeginResolve,
+            _a[converter_1.Converter.EVENT_RESOLVE] = this.onResolve,
+            _a));
+    };
+    CommentPlugin.prototype.storeModuleComment = function (comment, reflection) {
+        var isPreferred = (comment.toLowerCase().indexOf('@preferred') !== -1);
         if (this.comments[reflection.id]) {
-            const info = this.comments[reflection.id];
+            var info = this.comments[reflection.id];
             if (!isPreferred && (info.isPreferred || info.fullText.length > comment.length)) {
                 return;
             }
@@ -42,8 +60,8 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                 isPreferred: isPreferred
             };
         }
-    }
-    applyModifiers(reflection, comment) {
+    };
+    CommentPlugin.prototype.applyModifiers = function (reflection, comment) {
         if (comment.hasTag('private')) {
             reflection.setFlag(index_3.ReflectionFlag.Private);
             CommentPlugin_1.removeTags(comment, 'private');
@@ -66,16 +84,16 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
             }
             this.hidden.push(reflection);
         }
-    }
-    onBegin(context) {
+    };
+    CommentPlugin.prototype.onBegin = function (context) {
         this.comments = {};
-    }
-    onCreateTypeParameter(context, reflection, node) {
-        const comment = reflection.parent && reflection.parent.comment;
+    };
+    CommentPlugin.prototype.onCreateTypeParameter = function (context, reflection, node) {
+        var comment = reflection.parent.comment;
         if (comment) {
-            let tag = comment.getTag('typeparam', reflection.name);
+            var tag = comment.getTag('typeparam', reflection.name);
             if (!tag) {
-                tag = comment.getTag('param', `<${reflection.name}>`);
+                tag = comment.getTag('param', "<" + reflection.name + ">");
             }
             if (!tag) {
                 tag = comment.getTag('param', reflection.name);
@@ -85,88 +103,88 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                 comment.tags.splice(comment.tags.indexOf(tag), 1);
             }
         }
-    }
-    onDeclaration(context, reflection, node) {
+    };
+    CommentPlugin.prototype.onDeclaration = function (context, reflection, node) {
         if (!node) {
             return;
         }
-        const rawComment = comment_1.getRawComment(node);
+        var rawComment = comment_1.getRawComment(node);
         if (!rawComment) {
             return;
         }
         if (reflection.kindOf(index_3.ReflectionKind.FunctionOrMethod) || (reflection.kindOf(index_3.ReflectionKind.Event) && reflection['signatures'])) {
-            const comment = comment_1.parseComment(rawComment, reflection.comment);
+            var comment = comment_1.parseComment(rawComment, reflection.comment);
             this.applyModifiers(reflection, comment);
         }
         else if (reflection.kindOf(index_3.ReflectionKind.Module)) {
             this.storeModuleComment(rawComment, reflection);
         }
         else {
-            const comment = comment_1.parseComment(rawComment, reflection.comment);
+            var comment = comment_1.parseComment(rawComment, reflection.comment);
             this.applyModifiers(reflection, comment);
             reflection.comment = comment;
         }
-    }
-    onFunctionImplementation(context, reflection, node) {
+    };
+    CommentPlugin.prototype.onFunctionImplementation = function (context, reflection, node) {
         if (!node) {
             return;
         }
-        const comment = comment_1.getRawComment(node);
+        var comment = comment_1.getRawComment(node);
         if (comment) {
             reflection.comment = comment_1.parseComment(comment, reflection.comment);
         }
-    }
-    onBeginResolve(context) {
-        for (let id in this.comments) {
+    };
+    CommentPlugin.prototype.onBeginResolve = function (context) {
+        for (var id in this.comments) {
             if (!this.comments.hasOwnProperty(id)) {
                 continue;
             }
-            const info = this.comments[id];
-            const comment = comment_1.parseComment(info.fullText);
+            var info = this.comments[id];
+            var comment = comment_1.parseComment(info.fullText);
             CommentPlugin_1.removeTags(comment, 'preferred');
             this.applyModifiers(info.reflection, comment);
             info.reflection.comment = comment;
         }
         if (this.hidden) {
-            const project = context.project;
-            this.hidden.forEach((reflection) => {
-                CommentPlugin_1.removeReflection(project, reflection);
+            var project_1 = context.project;
+            this.hidden.forEach(function (reflection) {
+                CommentPlugin_1.removeReflection(project_1, reflection);
             });
         }
-    }
-    onResolve(context, reflection) {
+    };
+    CommentPlugin.prototype.onResolve = function (context, reflection) {
         if (!(reflection instanceof index_3.DeclarationReflection)) {
             return;
         }
-        const signatures = reflection.getAllSignatures();
+        var signatures = reflection.getAllSignatures();
         if (signatures.length) {
-            const comment = reflection.comment;
-            if (comment && comment.hasTag('returns')) {
-                comment.returns = comment.getTag('returns').text;
-                CommentPlugin_1.removeTags(comment, 'returns');
+            var comment_2 = reflection.comment;
+            if (comment_2 && comment_2.hasTag('returns')) {
+                comment_2.returns = comment_2.getTag('returns').text;
+                CommentPlugin_1.removeTags(comment_2, 'returns');
             }
-            signatures.forEach((signature) => {
-                let childComment = signature.comment;
+            signatures.forEach(function (signature) {
+                var childComment = signature.comment;
                 if (childComment && childComment.hasTag('returns')) {
                     childComment.returns = childComment.getTag('returns').text;
                     CommentPlugin_1.removeTags(childComment, 'returns');
                 }
-                if (comment) {
+                if (comment_2) {
                     if (!childComment) {
                         childComment = signature.comment = new index_1.Comment();
                     }
-                    childComment.shortText = childComment.shortText || comment.shortText;
-                    childComment.text = childComment.text || comment.text;
-                    childComment.returns = childComment.returns || comment.returns;
+                    childComment.shortText = childComment.shortText || comment_2.shortText;
+                    childComment.text = childComment.text || comment_2.text;
+                    childComment.returns = childComment.returns || comment_2.returns;
                 }
                 if (signature.parameters) {
-                    signature.parameters.forEach((parameter) => {
-                        let tag;
+                    signature.parameters.forEach(function (parameter) {
+                        var tag;
                         if (childComment) {
                             tag = childComment.getTag('param', parameter.name);
                         }
-                        if (comment && !tag) {
-                            tag = comment.getTag('param', parameter.name);
+                        if (comment_2 && !tag) {
+                            tag = comment_2.getTag('param', parameter.name);
                         }
                         if (tag) {
                             parameter.comment = new index_1.Comment(tag.text);
@@ -175,14 +193,14 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                 }
                 CommentPlugin_1.removeTags(childComment, 'param');
             });
-            CommentPlugin_1.removeTags(comment, 'param');
+            CommentPlugin_1.removeTags(comment_2, 'param');
         }
-    }
-    static removeTags(comment, tagName) {
+    };
+    CommentPlugin.removeTags = function (comment, tagName) {
         if (!comment || !comment.tags) {
             return;
         }
-        let i = 0, c = comment.tags.length;
+        var i = 0, c = comment.tags.length;
         while (i < c) {
             if (comment.tags[i].tagName === tagName) {
                 comment.tags.splice(i, 1);
@@ -192,16 +210,16 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                 i++;
             }
         }
-    }
-    static removeReflection(project, reflection) {
-        reflection.traverse((child) => CommentPlugin_1.removeReflection(project, child));
-        const parent = reflection.parent;
-        parent.traverse((child, property) => {
+    };
+    CommentPlugin.removeReflection = function (project, reflection) {
+        reflection.traverse(function (child) { return CommentPlugin_1.removeReflection(project, child); });
+        var parent = reflection.parent;
+        parent.traverse(function (child, property) {
             if (child === reflection) {
                 switch (property) {
                     case index_3.TraverseProperty.Children:
                         if (parent.children) {
-                            const index = parent.children.indexOf(reflection);
+                            var index = parent.children.indexOf(reflection);
                             if (index !== -1) {
                                 parent.children.splice(index, 1);
                             }
@@ -215,7 +233,7 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                         break;
                     case index_3.TraverseProperty.Parameters:
                         if (reflection.parent.parameters) {
-                            const index = reflection.parent.parameters.indexOf(reflection);
+                            var index = reflection.parent.parameters.indexOf(reflection);
                             if (index !== -1) {
                                 reflection.parent.parameters.splice(index, 1);
                             }
@@ -226,7 +244,7 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                         break;
                     case index_3.TraverseProperty.Signatures:
                         if (parent.signatures) {
-                            const index = parent.signatures.indexOf(reflection);
+                            var index = parent.signatures.indexOf(reflection);
                             if (index !== -1) {
                                 parent.signatures.splice(index, 1);
                             }
@@ -237,7 +255,7 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                         break;
                     case index_3.TraverseProperty.TypeParameter:
                         if (parent.typeParameters) {
-                            const index = parent.typeParameters.indexOf(reflection);
+                            var index = parent.typeParameters.indexOf(reflection);
                             if (index !== -1) {
                                 parent.typeParameters.splice(index, 1);
                             }
@@ -246,17 +264,19 @@ let CommentPlugin = CommentPlugin_1 = class CommentPlugin extends components_1.C
                 }
             }
         });
-        let id = reflection.id;
+        var id = reflection.id;
         delete project.reflections[id];
-        for (let key in project.symbolMapping) {
+        for (var key in project.symbolMapping) {
             if (project.symbolMapping.hasOwnProperty(key) && project.symbolMapping[key] === id) {
                 delete project.symbolMapping[key];
             }
         }
-    }
-};
-CommentPlugin = CommentPlugin_1 = __decorate([
-    components_1.Component({ name: 'comment' })
-], CommentPlugin);
+    };
+    var CommentPlugin_1;
+    CommentPlugin = CommentPlugin_1 = __decorate([
+        components_1.Component({ name: 'comment' })
+    ], CommentPlugin);
+    return CommentPlugin;
+}(components_1.ConverterComponent));
 exports.CommentPlugin = CommentPlugin;
 //# sourceMappingURL=CommentPlugin.js.map

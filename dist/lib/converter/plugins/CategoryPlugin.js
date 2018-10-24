@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,20 +19,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var CategoryPlugin_1;
-const index_1 = require("../../models/reflections/index");
-const ReflectionCategory_1 = require("../../models/ReflectionCategory");
-const components_1 = require("../components");
-const converter_1 = require("../converter");
-const GroupPlugin_1 = require("./GroupPlugin");
-let CategoryPlugin = CategoryPlugin_1 = class CategoryPlugin extends components_1.ConverterComponent {
-    initialize() {
-        this.listenTo(this.owner, {
-            [converter_1.Converter.EVENT_RESOLVE]: this.onResolve,
-            [converter_1.Converter.EVENT_RESOLVE_END]: this.onEndResolve
-        });
+var index_1 = require("../../models/reflections/index");
+var ReflectionCategory_1 = require("../../models/ReflectionCategory");
+var components_1 = require("../components");
+var converter_1 = require("../converter");
+var GroupPlugin_1 = require("./GroupPlugin");
+var CategoryPlugin = (function (_super) {
+    __extends(CategoryPlugin, _super);
+    function CategoryPlugin() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    onResolve(context, reflection) {
+    CategoryPlugin_1 = CategoryPlugin;
+    CategoryPlugin.prototype.initialize = function () {
+        var _a;
+        this.listenTo(this.owner, (_a = {},
+            _a[converter_1.Converter.EVENT_RESOLVE] = this.onResolve,
+            _a[converter_1.Converter.EVENT_RESOLVE_END] = this.onEndResolve,
+            _a));
+    };
+    CategoryPlugin.prototype.onResolve = function (context, reflection) {
         if (reflection instanceof index_1.ContainerReflection) {
             if (reflection.children && reflection.children.length > 0) {
                 reflection.children.sort(GroupPlugin_1.GroupPlugin.sortCallback);
@@ -29,18 +47,18 @@ let CategoryPlugin = CategoryPlugin_1 = class CategoryPlugin extends components_
                 reflection.categories.sort(CategoryPlugin_1.sortCatCallback);
             }
         }
-    }
-    onEndResolve(context) {
+    };
+    CategoryPlugin.prototype.onEndResolve = function (context) {
         function walkDirectory(directory) {
             directory.categories = CategoryPlugin_1.getReflectionCategories(directory.getAllReflections());
-            for (let key in directory.directories) {
+            for (var key in directory.directories) {
                 if (!directory.directories.hasOwnProperty(key)) {
                     continue;
                 }
                 walkDirectory(directory.directories[key]);
             }
         }
-        const project = context.project;
+        var project = context.project;
         if (project.children && project.children.length > 0) {
             project.children.sort(GroupPlugin_1.GroupPlugin.sortCallback);
             project.categories = CategoryPlugin_1.getReflectionCategories(project.children);
@@ -49,51 +67,51 @@ let CategoryPlugin = CategoryPlugin_1 = class CategoryPlugin extends components_
             project.categories.sort(CategoryPlugin_1.sortCatCallback);
         }
         walkDirectory(project.directory);
-        project.files.forEach((file) => {
+        project.files.forEach(function (file) {
             file.categories = CategoryPlugin_1.getReflectionCategories(file.reflections);
         });
-    }
-    static getReflectionCategories(reflections) {
-        const categories = [];
-        reflections.forEach((child) => {
-            const childCat = CategoryPlugin_1.getCategory(child);
+    };
+    CategoryPlugin.getReflectionCategories = function (reflections) {
+        var categories = [];
+        reflections.forEach(function (child) {
+            var childCat = CategoryPlugin_1.getCategory(child);
             if (childCat === '') {
                 return;
             }
-            for (let i = 0; i < categories.length; i++) {
-                const category = categories[i];
-                if (category.title !== childCat) {
+            for (var i = 0; i < categories.length; i++) {
+                var category_1 = categories[i];
+                if (category_1.title !== childCat) {
                     continue;
                 }
-                category.children.push(child);
+                category_1.children.push(child);
                 return;
             }
-            const category = new ReflectionCategory_1.ReflectionCategory(childCat);
+            var category = new ReflectionCategory_1.ReflectionCategory(childCat);
             category.children.push(child);
             categories.push(category);
         });
         return categories;
-    }
-    static getCategory(reflection) {
+    };
+    CategoryPlugin.getCategory = function (reflection) {
         if (reflection.comment) {
-            const tags = reflection.comment.tags;
+            var tags = reflection.comment.tags;
             if (tags) {
-                for (let i = 0; i < tags.length; i++) {
+                for (var i = 0; i < tags.length; i++) {
                     if (tags[i].tagName === 'category') {
-                        let tag = tags[i].text;
+                        var tag = tags[i].text;
                         return (tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase()).trim();
                     }
                 }
             }
         }
         return '';
-    }
-    static sortCallback(a, b) {
+    };
+    CategoryPlugin.sortCallback = function (a, b) {
         return a.name > b.name ? 1 : -1;
-    }
-    static sortCatCallback(a, b) {
-        const aWeight = CategoryPlugin_1.WEIGHTS.indexOf(a.title);
-        const bWeight = CategoryPlugin_1.WEIGHTS.indexOf(b.title);
+    };
+    CategoryPlugin.sortCatCallback = function (a, b) {
+        var aWeight = CategoryPlugin_1.WEIGHTS.indexOf(a.title);
+        var bWeight = CategoryPlugin_1.WEIGHTS.indexOf(b.title);
         if (aWeight < 0 && bWeight < 0) {
             return a.title > b.title ? 1 : -1;
         }
@@ -104,11 +122,13 @@ let CategoryPlugin = CategoryPlugin_1 = class CategoryPlugin extends components_
             return -1;
         }
         return aWeight - bWeight;
-    }
-};
-CategoryPlugin.WEIGHTS = [];
-CategoryPlugin = CategoryPlugin_1 = __decorate([
-    components_1.Component({ name: 'category' })
-], CategoryPlugin);
+    };
+    var CategoryPlugin_1;
+    CategoryPlugin.WEIGHTS = [];
+    CategoryPlugin = CategoryPlugin_1 = __decorate([
+        components_1.Component({ name: 'category' })
+    ], CategoryPlugin);
+    return CategoryPlugin;
+}(components_1.ConverterComponent));
 exports.CategoryPlugin = CategoryPlugin;
 //# sourceMappingURL=CategoryPlugin.js.map

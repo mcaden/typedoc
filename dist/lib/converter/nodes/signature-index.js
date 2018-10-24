@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -6,27 +19,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ts = require("typescript");
-const index_1 = require("../../models/index");
-const index_2 = require("../factories/index");
-const components_1 = require("../components");
-let IndexSignatureConverter = class IndexSignatureConverter extends components_1.ConverterNodeComponent {
-    constructor() {
-        super(...arguments);
-        this.supports = [
+var ts = require("typescript");
+var index_1 = require("../../models/index");
+var index_2 = require("../factories/index");
+var components_1 = require("../components");
+var IndexSignatureConverter = (function (_super) {
+    __extends(IndexSignatureConverter, _super);
+    function IndexSignatureConverter() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.supports = [
             ts.SyntaxKind.IndexSignature
         ];
+        return _this;
     }
-    convert(context, node) {
-        const scope = context.scope;
+    IndexSignatureConverter.prototype.convert = function (context, node) {
+        var scope = context.scope;
         if (scope instanceof index_1.DeclarationReflection) {
             scope.indexSignature = index_2.createSignature(context, node, '__index', index_1.ReflectionKind.IndexSignature);
         }
         return scope;
-    }
-};
-IndexSignatureConverter = __decorate([
-    components_1.Component({ name: 'node:signature-index' })
-], IndexSignatureConverter);
+    };
+    IndexSignatureConverter = __decorate([
+        components_1.Component({ name: 'node:signature-index' })
+    ], IndexSignatureConverter);
+    return IndexSignatureConverter;
+}(components_1.ConverterNodeComponent));
 exports.IndexSignatureConverter = IndexSignatureConverter;
 //# sourceMappingURL=signature-index.js.map
