@@ -50,7 +50,7 @@ export class DeepCommentPlugin extends ConverterComponent {
             while (target && !(target instanceof ProjectReflection)) {
                 push(target);
                 if (target.comment) {
-                    let tag: CommentTag | undefined;
+                    let tag: CommentTag;
                     if (reflection instanceof TypeParameterReflection) {
                         tag = target.comment.getTag('typeparam', reflection.name);
                         if (!tag) {
@@ -63,8 +63,7 @@ export class DeepCommentPlugin extends ConverterComponent {
                     }
 
                     if (tag) {
-                        // If we found a tag, comment.tags mus be set.
-                        target.comment.tags!.splice(target.comment.tags!.indexOf(tag), 1);
+                        target.comment.tags.splice(target.comment.tags.indexOf(tag), 1);
                         reflection.comment = new Comment('', tag.text);
                         break;
                     }

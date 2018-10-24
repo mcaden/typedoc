@@ -35,14 +35,16 @@ export class TypeParameterConverter extends ConverterTypeComponent implements Ty
      * @param node  The type reference node representing a type parameter.
      * @returns The type reflection representing the given type parameter.
      */
-    convertNode(context: Context, node: ts.TypeReferenceNode): Type | undefined {
+    convertNode(context: Context, node: ts.TypeReferenceNode): Type {
         if (node.typeName) {
             const name = _ts.getTextOfNode(node.typeName);
             if (context.typeParameters && context.typeParameters[name]) {
                 return context.typeParameters[name].clone();
             }
 
-            return new TypeParameterType(name);
+            const result = new TypeParameterType();
+            result.name = name;
+            return result;
         }
     }
 }

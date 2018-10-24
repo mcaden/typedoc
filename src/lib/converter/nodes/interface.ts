@@ -22,8 +22,8 @@ export class InterfaceConverter extends ConverterNodeComponent<ts.InterfaceDecla
      * @param node     The interface declaration node that should be analyzed.
      * @return The resulting reflection or NULL.
      */
-    convert(context: Context, node: ts.InterfaceDeclaration): Reflection | undefined {
-        let reflection: DeclarationReflection | undefined;
+    convert(context: Context, node: ts.InterfaceDeclaration): Reflection {
+        let reflection: DeclarationReflection;
         if (context.isInherit && context.inheritParent === node) {
             reflection = <DeclarationReflection> context.scope;
         } else {
@@ -42,13 +42,10 @@ export class InterfaceConverter extends ConverterNodeComponent<ts.InterfaceDecla
                 baseTypes.forEach((baseType) => {
                     const type = context.getTypeAtLocation(baseType);
                     if (!context.isInherit) {
-                        if (!reflection!.extendedTypes) {
-                            reflection!.extendedTypes = [];
+                        if (!reflection.extendedTypes) {
+                            reflection.extendedTypes = [];
                         }
-                        const convertedType = this.owner.convertType(context, baseType, type);
-                        if (convertedType) {
-                            reflection!.extendedTypes!.push(convertedType);
-                        }
+                        reflection.extendedTypes.push(this.owner.convertType(context, baseType, type));
                     }
 
                     if (type && type.symbol) {

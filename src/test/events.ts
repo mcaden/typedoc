@@ -12,9 +12,9 @@ import * as _ from 'lodash';
 import { EventDispatcher, Event } from '../lib/utils/events';
 
 class Events extends EventDispatcher {
-    counter = 0;
-    counterA = 0;
-    counterB = 0;
+    counter?: number;
+    counterA?: number;
+    counterB?: number;
 }
 
 describe('Events', function () {
@@ -178,11 +178,11 @@ describe('Events', function () {
         a.listenTo(b, 'event', cb);
         b.on('event', cb);
         a.listenTo(b, 'event2', cb);
-        a.stopListening(undefined, {event: cb});
+        a.stopListening(null, {event: cb});
         b.trigger('event event2');
         b.off();
         a.listenTo(b, 'event event2', cb);
-        a.stopListening(undefined, 'event');
+        a.stopListening(null, 'event');
         a.stopListening();
         b.trigger('event2');
     });
@@ -416,14 +416,13 @@ describe('Events', function () {
 
     it('listenTo with empty callback does not throw an error', function () {
         const e = new Events();
-        e.listenTo(e, 'foo', undefined);
+        e.listenTo(e, 'foo', null);
         e.trigger('foo');
         Assert(true);
     });
 
     it('trigger all for each event', function () {
-        let a = false;
-        let b = false;
+        let a: boolean, b: boolean;
         const obj = new Events();
         obj.counter = 0;
         obj.on('all', function (event) {
@@ -587,7 +586,7 @@ describe('Events', function () {
         obj.on('x y all', function () {
             Assert(false);
         }, obj);
-        obj.off(undefined, undefined, obj);
+        obj.off(null, null, obj);
         obj.trigger('x y');
     });
 
@@ -601,7 +600,7 @@ describe('Events', function () {
         };
         obj.on('x y all', success);
         obj.on('x y all', fail);
-        obj.off(undefined, fail);
+        obj.off(null, fail);
         obj.trigger('x y');
     });
 
@@ -613,7 +612,7 @@ describe('Events', function () {
         obj.on('event', function () {
             Assert(false);
         }, obj);
-        obj.off(undefined, undefined, obj);
+        obj.off(null, null, obj);
         obj.trigger('event');
     });
 
@@ -712,7 +711,7 @@ describe('Events', function () {
         obj.once('event', function () {
             Assert(false);
         }, context);
-        obj.off(undefined, undefined, context);
+        obj.off(null, null, context);
         obj.trigger('event');
     });
 
@@ -782,7 +781,7 @@ describe('Events', function () {
 
         Assert.equal(obj, obj.trigger('noeventssetyet'));
         Assert.equal(obj, obj.off('noeventssetyet'));
-        Assert.equal(obj, obj.stopListening(undefined, 'noeventssetyet'));
+        Assert.equal(obj, obj.stopListening(null, 'noeventssetyet'));
         Assert.equal(obj, obj.on('a', fn));
         Assert.equal(obj, obj.once('c', fn));
         Assert.equal(obj, obj.trigger('a'));

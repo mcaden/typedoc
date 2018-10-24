@@ -7,12 +7,13 @@ import { Comment, CommentTag } from '../../models/comments/index';
  * Return the parsed comment of the given TypeScript node.
  *
  * @param node  The node whose comment should be returned.
- * @return The parsed comment as a [[Comment]] instance or undefined if no comment is present.
+ * @return The parsed comment as a [[Comment]] instance or NULL if
+ *     no comment is present.
  */
-export function createComment(node: ts.Node): Comment | undefined {
+export function createComment(node: ts.Node): Comment {
     const comment = getRawComment(node);
-    if (!comment) {
-        return;
+    if (comment == null) {
+        return null;
     }
 
     return parseComment(comment);
@@ -21,7 +22,7 @@ export function createComment(node: ts.Node): Comment | undefined {
 /**
  * Check whether the given module declaration is the topmost.
  *
- * This function returns TRUE if there is no trailing module defined, in
+ * This funtion returns TRUE if there is no trailing module defined, in
  * the following example this would be the case only for module <code>C</code>.
  *
  * ```
@@ -69,14 +70,14 @@ function getRootModuleDeclaration(node: ts.ModuleDeclaration): ts.Node {
  * Return the raw comment string for the given node.
  *
  * @param node  The node whose comment should be resolved.
- * @returns     The raw comment string or undefined if no comment could be found.
+ * @returns     The raw comment string or NULL if no comment could be found.
  */
-export function getRawComment(node: ts.Node): string | undefined {
+export function getRawComment(node: ts.Node): string {
     if (node.parent && node.parent.kind === ts.SyntaxKind.VariableDeclarationList) {
         node = node.parent.parent;
     } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
         if (!isTopmostModuleDeclaration(<ts.ModuleDeclaration> node)) {
-            return;
+            return null;
         } else {
             node = getRootModuleDeclaration(<ts.ModuleDeclaration> node);
         }
@@ -88,7 +89,7 @@ export function getRawComment(node: ts.Node): string | undefined {
         let comment: ts.CommentRange;
         if (node.kind === ts.SyntaxKind.SourceFile) {
             if (comments.length === 1) {
-                return;
+                return null;
             }
             comment = comments[0];
         } else {
@@ -97,7 +98,7 @@ export function getRawComment(node: ts.Node): string | undefined {
 
         return sourceFile.text.substring(comment.pos, comment.end);
     } else {
-        return;
+        return null;
     }
 }
 
@@ -137,7 +138,7 @@ export function parseComment(text: string, comment: Comment = new Comment()): Co
 
     function readTagLine(line: string, tag: RegExpExecArray) {
         let tagName = tag[1].toLowerCase();
-        let paramName: string | undefined;
+        let paramName: string;
         line = line.substr(tagName.length + 1).trim();
 
         if (tagName === 'return') { tagName = 'returns'; }
@@ -178,6 +179,8 @@ export function parseComment(text: string, comment: Comment = new Comment()): Co
         readBareLine(line);
     }
 
+    // text = text.replace(/^\s*\/\*+\s*(\r\n?|\n)/, '');
+    // text = text.replace(/(\r\n?|\n)\s*\*+\/\s*$/, '');
     text = text.replace(/^\s*\/\*+/, '');
     text = text.replace(/\*+\/\s*$/, '');
     text.split(/\r\n?|\n/).forEach(readLine);

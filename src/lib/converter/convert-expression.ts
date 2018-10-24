@@ -8,11 +8,11 @@ import * as _ts from '../ts-internal';
  * @returns The default value as a string.
  */
 
-export function convertDefaultValue(node: ts.VariableDeclaration|ts.ParameterDeclaration|ts.EnumMember): string | undefined {
+export function convertDefaultValue(node: ts.VariableDeclaration|ts.ParameterDeclaration|ts.EnumMember): string {
     if (node.initializer) {
         return convertExpression(node.initializer);
     } else {
-        return undefined;
+        return null;
     }
 }
 

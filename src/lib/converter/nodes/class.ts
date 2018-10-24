@@ -23,8 +23,8 @@ export class ClassConverter extends ConverterNodeComponent<ts.ClassDeclaration> 
      * @param node     The class declaration node that should be analyzed.
      * @return The resulting reflection or NULL.
      */
-    convert(context: Context, node: ts.ClassDeclaration): Reflection | undefined {
-        let reflection: DeclarationReflection | undefined;
+    convert(context: Context, node: ts.ClassDeclaration): Reflection {
+        let reflection: DeclarationReflection;
         if (context.isInherit && context.inheritParent === node) {
             reflection = <DeclarationReflection> context.scope;
         } else {
@@ -54,13 +54,10 @@ export class ClassConverter extends ConverterNodeComponent<ts.ClassDeclaration> 
             if (baseType) {
                 const type = context.getTypeAtLocation(baseType);
                 if (!context.isInherit) {
-                    if (!reflection!.extendedTypes) {
-                        reflection!.extendedTypes = [];
+                    if (!reflection.extendedTypes) {
+                        reflection.extendedTypes = [];
                     }
-                    const convertedType = this.owner.convertType(context, baseType, type);
-                    if (convertedType) {
-                        reflection!.extendedTypes!.push(convertedType);
-                    }
+                    reflection.extendedTypes.push(this.owner.convertType(context, baseType, type));
                 }
 
                 if (type && type.symbol) {
@@ -71,9 +68,14 @@ export class ClassConverter extends ConverterNodeComponent<ts.ClassDeclaration> 
             }
 
             const implementedTypes = _ts.getClassImplementsHeritageClauseElements(node);
-            if (implementedTypes && implementedTypes.length) {
-                const implemented = this.owner.convertTypes(context, implementedTypes);
-                reflection!.implementedTypes = (reflection!.implementedTypes || []).concat(implemented);
+            if (implementedTypes) {
+                implementedTypes.forEach((implementedType) => {
+                    if (!reflection.implementedTypes) {
+                        reflection.implementedTypes = [];
+                    }
+
+                    reflection.implementedTypes.push(this.owner.convertType(context, implementedType));
+                });
             }
         });
 

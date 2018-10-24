@@ -4,7 +4,6 @@
 .baseDir.js
 .baseDir.ts
 yarn.lock
-yarn-error.log
 
 /src/typings/typescript/typescript.js
 

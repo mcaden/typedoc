@@ -7,8 +7,9 @@ import { SourceReferenceWrapper } from '../models';
 @Component({name: 'serializer:container-reflection'})
 export class ContainerReflectionSerializer extends ReflectionSerializerComponent<ContainerReflection> {
 
-  supports(t: unknown) {
-    return t instanceof ContainerReflection;
+  initialize(): void {
+    super.initialize();
+    this.supports = (r: ContainerReflection) => r instanceof ContainerReflection;
   }
 
   toObject(container: ContainerReflection, obj?: any): any {

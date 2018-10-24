@@ -7,7 +7,7 @@ import { DeclarationOption, ParameterScope, ParameterType, ParameterHint } from 
 
 @Component({name: 'options:typescript'})
 export class TypeScriptSource extends OptionsComponent {
-    private declarations!: DeclarationOption[];
+    private declarations: DeclarationOption[];
 
     /**
      * A list of all TypeScript parameters that should be ignored.
@@ -19,10 +19,11 @@ export class TypeScriptSource extends OptionsComponent {
     ];
 
     initialize() {
+        const ignored = TypeScriptSource.IGNORED;
         this.declarations = [];
 
         for (let declaration of _ts.optionDeclarations) {
-            if (TypeScriptSource.IGNORED.indexOf(declaration.name) === -1) {
+            if (ignored.indexOf(declaration.name) === -1) {
                 this.addTSOption(declaration);
             }
         }
@@ -39,7 +40,7 @@ export class TypeScriptSource extends OptionsComponent {
         const param: DeclarationOption = {
             name:      option.name,
             short:     option.shortName,
-            help:      option.description ? option.description.key : '',
+            help:      option.description ? option.description.key : null,
             scope:     ParameterScope.TypeScript,
             component: this.componentName
         };
